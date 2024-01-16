@@ -1,11 +1,10 @@
 package com.ra.controller.user;
 
-import com.ra.dto.request.cart.CartRequestDTO;
 import com.ra.dto.request.cart.AddToCartRequestDTO;
-import com.ra.dto.respose.orders.OrderDetailResponseDTO;
+import com.ra.dto.request.cart.CartRequestDTO;
+import com.ra.dto.respose.cart.CartResponseDTO;
 import com.ra.dto.respose.orders.OrderResponseDTO;
 import com.ra.exception.*;
-import com.ra.model.Orders;
 import com.ra.security.principle.UserDetailService;
 import com.ra.service.cart.CartService;
 import com.ra.service.order.OrderService;
@@ -31,10 +30,24 @@ public class CartController {
     private OrderService orderService;
     @Autowired
     private OrderDetailService orderDetailService;
+    @GetMapping("/cart")
+    public ResponseEntity<?> getCart(Authentication authentication) throws UserNotFoundException, ProductNotFoundExceptions {
+        if (authentication != null && authentication.isAuthenticated()) {
+            Long userId = userDetailsService.getUserIdFromAuthentication(authentication);
+            if (userId != null) {
+                List<CartResponseDTO>list=cartService.findAllByUser(userId);
+                return ResponseEntity.ok(list);
+            } else {
+                return ResponseEntity.status(401).body("User ID not found in authentication details");
+            }
+        } else {
+            return ResponseEntity.status(401).body("User not authenticated");
+        }
+    }
 
     @PostMapping("/cart")
     public ResponseEntity<?> addToCart(@RequestBody @Valid AddToCartRequestDTO addToCartRequestDTO,
-            Authentication authentication) throws UserNotFoundException, ProductNotFoundExceptions {
+            Authentication authentication) throws UserNotFoundException, ProductNotFoundExceptions, QuantityException {
            if (authentication != null && authentication.isAuthenticated()) {
                Long userId = userDetailsService.getUserIdFromAuthentication(authentication);
                if (userId != null) {
@@ -47,33 +60,44 @@ public class CartController {
                return ResponseEntity.status(401).body("User not authenticated");
            }
     }
-    @PutMapping("/cart")
-    public ResponseEntity<?>updateCart(@RequestBody @Valid CartRequestDTO cartRequestDTO,
-                                       Authentication authentication) throws UserNotFoundException,ProductNotFoundExceptions {
-            if (authentication != null && authentication.isAuthenticated()) {
-                Long userId = userDetailsService.getUserIdFromAuthentication(authentication);
-                if (userId != null) {
-                    cartService.updateProductQuantity(userId,cartRequestDTO);
-                    return ResponseEntity.ok("Product update to the cart successfully");
-                } else {
-                    return ResponseEntity.status(401).body("User ID not found in authentication details");
-                }
-            } else {
-                return ResponseEntity.status(401).body("User not authenticated");
-            }
+    @PutMapping("/cart-update")
+    public ResponseEntity<?>updateCart(@Valid @RequestBody CartRequestDTO cartRequestDTO,
+                                       Authentication authentication) throws QuantityException {
+           try {
+               if (authentication != null && authentication.isAuthenticated()) {
+                   Long userId = userDetailsService.getUserIdFromAuthentication(authentication);
+                   if (userId != null) {
+                       cartService.updateProductQuantity(userId,cartRequestDTO);
+                       return ResponseEntity.ok("Product update to the cart successfully");
+                   } else {
+                       return ResponseEntity.status(401).body("User ID not found in authentication details");
+                   }
+               } else {
+                   return ResponseEntity.status(401).body("User not authenticated");
+               }
+           }catch (Exception e) {
+               return new ResponseEntity<>("Application context error", HttpStatus.BAD_REQUEST);
+           } catch (ProductIDNotFoundException e) {
+               throw new RuntimeException(e);
+           }
     }
     @DeleteMapping("/cart/{id}")
-    public ResponseEntity<?>deleteCart(@PathVariable Long id, Authentication authentication) throws UserNotFoundException {
-            if (authentication != null && authentication.isAuthenticated()) {
-                Long userId = userDetailsService.getUserIdFromAuthentication(authentication);
-                if (userId != null) {
-                    cartService.deleteCartItem(userId,id);
-                    return ResponseEntity.ok("Product delete to the cart successfully");
+    public ResponseEntity<?>deleteCart(@PathVariable String id, Authentication authentication) throws UserNotFoundException {
+            try {
+                Long cartId= Long.valueOf(id);
+                if (authentication != null && authentication.isAuthenticated()) {
+                    Long userId = userDetailsService.getUserIdFromAuthentication(authentication);
+                    if (userId != null) {
+                        cartService.deleteCartItem(userId,cartId);
+                        return ResponseEntity.ok("Product delete to the cart successfully");
+                    } else {
+                        return ResponseEntity.status(401).body("User ID not found in authentication details");
+                    }
                 } else {
-                    return ResponseEntity.status(401).body("User ID not found in authentication details");
+                    return ResponseEntity.status(401).body("User not authenticated");
                 }
-            } else {
-                return ResponseEntity.status(401).body("User not authenticated");
+            }catch (Exception e) {
+                return new ResponseEntity<>("Application context error", HttpStatus.BAD_REQUEST);
             }
     }
     @PostMapping("/cart/checkout")
@@ -96,7 +120,7 @@ public class CartController {
             Long userId = userDetailsService.getUserIdFromAuthentication(authentication);
             if (userId != null) {
                 List<OrderResponseDTO> orders=orderService.findAllById(userId);
-                return new  ResponseEntity(orders, HttpStatus.OK);
+                return new  ResponseEntity<>(orders, HttpStatus.OK);
             } else {
                 return ResponseEntity.status(401).body("User ID not found in authentication details");
             }
@@ -105,23 +129,33 @@ public class CartController {
         }
     }
     @GetMapping("/history/{orderId}")
-    public ResponseEntity<?>findAllOrderId(@PathVariable Long orderId,Authentication authentication) throws OrderNotFoundException, UserNotFoundException {
+    public ResponseEntity<?>findAllOrderId(@PathVariable String orderId,Authentication authentication) throws OrderNotFoundException, UserNotFoundException {
 
-        if (authentication != null && authentication.isAuthenticated()) {
-            Long userId = userDetailsService.getUserIdFromAuthentication(authentication);
-            if (userId != null) {
-                List<OrderResponseDTO>list=orderService.findAllByOrderId(userId,orderId);
-                return new  ResponseEntity(list, HttpStatus.OK);
-            } else {
-                return ResponseEntity.status(401).body("User ID not found in authentication details");
-            }
-        } else {
-            return ResponseEntity.status(401).body("User not authenticated");
-        }
+       try{
+           Long odId= Long.valueOf(orderId);
+           if (authentication != null && authentication.isAuthenticated()) {
+               Long userId = userDetailsService.getUserIdFromAuthentication(authentication);
+               if (userId != null) {
+                   List<OrderResponseDTO>list=orderService.findAllByOrderId(userId,odId);
+                   return new  ResponseEntity<>(list, HttpStatus.OK);
+               } else {
+                   return ResponseEntity.status(401).body("User ID not found in authentication details");
+               }
+           } else {
+               return ResponseEntity.status(401).body("User not authenticated");
+           }
+       }catch (Exception e) {
+           return new ResponseEntity<>("Application context error", HttpStatus.BAD_REQUEST);
+       }
     }
     @PatchMapping("/history/{orderId}/cancel")
-    public ResponseEntity<?>cancel(@PathVariable("orderId") Long orderId) throws OrderNotFoundException {
-        OrderResponseDTO orderResponseDTO=orderService.updateStatus(orderId,2);
-        return new ResponseEntity<>(orderResponseDTO,HttpStatus.OK);
+    public ResponseEntity<?>cancel(@PathVariable("orderId") String orderId) throws OrderNotFoundException {
+       try {
+           Long idOrder=Long.parseLong(orderId);
+
+           return new ResponseEntity<>(orderService.updateStatus(idOrder,2),HttpStatus.OK);
+       }catch (Exception e) {
+           return new ResponseEntity<>("error", HttpStatus.BAD_REQUEST);
+       }
     }
 }

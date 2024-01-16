@@ -4,6 +4,7 @@ import com.ra.dto.request.CategoryRequestDTO;
 import com.ra.dto.respose.CategoryResponseDTO;
 import com.ra.exception.CategoryAlreadyExistsException;
 import com.ra.model.Category;
+import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 
@@ -13,5 +14,6 @@ public interface CategoryService {
     CategoryResponseDTO findById(Long id);
     CategoryResponseDTO updateCategory(CategoryRequestDTO categoryRequestDTO,Long id);
     void updateCategoryStatus(Long categoryId);
+    long countCategoriesByStatusTrue();
 
 }

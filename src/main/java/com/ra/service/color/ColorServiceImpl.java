@@ -2,6 +2,7 @@ package com.ra.service.color;
 
 import com.ra.dto.request.color.ColorRequestDTO;
 import com.ra.exception.ColorExceptionNotFound;
+import com.ra.exception.SizeNotFoundException;
 import com.ra.model.Color;
 import com.ra.repository.ColorRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,8 +50,12 @@ public class ColorServiceImpl implements ColorService{
     }
 
     @Override
-    public Color findByColorName(String colorName) {
-        return colorRepository.findColorByName(colorName);
+    public Color findByColorName(String colorName) throws ColorExceptionNotFound {
+        Color color=colorRepository.findColorByName(colorName);
+        if (color==null){
+            throw  new ColorExceptionNotFound("Color not found for name:" + colorName);
+        }
+        return color;
     }
 
 

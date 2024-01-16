@@ -20,4 +20,6 @@ public interface CategoryRepository extends JpaRepository<Category,Long> {
     void updateCategoryStatus(@Param("categoryId") Long categoryId);
 
     boolean existsById(Long id);
+    @Query("SELECT COUNT(c) FROM Category c WHERE c.status = true")
+    long countCategoriesByStatusTrue();
 }

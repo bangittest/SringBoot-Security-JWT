@@ -11,5 +11,5 @@ public interface SizeService {
     Size createSize(SizeRequestDTO sizeRequestDTO);
     Size findById(Long sizeId) throws SizeNotFoundException;
     Size updateSize(Long sizeId, SizeRequestDTO sizeRequestDTO) throws SizeNotFoundException;
-    Size findByName(String name);
+    Size findByName(String name) throws SizeNotFoundException;
 }

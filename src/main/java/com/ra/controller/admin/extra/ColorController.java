@@ -6,6 +6,7 @@ import com.ra.model.Color;
 import com.ra.service.color.ColorService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,14 +28,24 @@ public class ColorController {
         return ResponseEntity.ok(color1);
     }
     @GetMapping("/color/{id}")
-    public ResponseEntity<?>findColorId(@PathVariable Long id) throws ColorExceptionNotFound {
-        Color color=colorService.findById(id);
-        return ResponseEntity.ok(color);
+    public ResponseEntity<?>findColorId(@PathVariable String id) throws ColorExceptionNotFound {
+      try {
+          Long colorId= Long.valueOf(id);
+          Color color=colorService.findById(colorId);
+          return ResponseEntity.ok(color);
+      }catch (Exception e) {
+          return new ResponseEntity<>("Application context error", HttpStatus.BAD_REQUEST);
+      }
     }
     @PutMapping("/color/{id}")
-    public ResponseEntity<?>updateColor(@PathVariable Long id,@RequestBody @Valid ColorRequestDTO colorRequestDTO) throws ColorExceptionNotFound {
-        Color color1=colorService.updateColor(id,colorRequestDTO);
-        return ResponseEntity.ok(color1);
+    public ResponseEntity<?>updateColor(@PathVariable String id,@RequestBody @Valid ColorRequestDTO colorRequestDTO) throws ColorExceptionNotFound {
+      try {
+          Long colorId= Long.valueOf(id);
+          Color color1=colorService.updateColor(colorId,colorRequestDTO);
+          return ResponseEntity.ok(color1);
+      }catch (Exception e) {
+          return new ResponseEntity<>("Application context error", HttpStatus.BAD_REQUEST);
+      }
     }
 
 }

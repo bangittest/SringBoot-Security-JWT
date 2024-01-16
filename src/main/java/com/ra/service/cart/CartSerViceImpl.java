@@ -1,17 +1,19 @@
 package com.ra.service.cart;
 
-import com.ra.dto.request.cart.CartRequestDTO;
 import com.ra.dto.request.cart.AddToCartRequestDTO;
+import com.ra.dto.request.cart.CartRequestDTO;
+import com.ra.dto.respose.cart.CartResponseDTO;
 import com.ra.exception.*;
 import com.ra.model.*;
 import com.ra.repository.*;
 import com.ra.service.product.ProductService;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
-import java.util.Optional;
+import java.util.List;
 
 @Service
 public class CartSerViceImpl implements CartService{
@@ -28,46 +30,61 @@ public class CartSerViceImpl implements CartService{
     OrderRepository orderRepository;
     @Autowired
     OrderDetailRepository orderDetailRepository;
+
     @Override
-    public void addToCart(Long userId, AddToCartRequestDTO addToCartRequestDTO) throws UserNotFoundException {
-        User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("User not found"));
-        Product product = productRepository.findById(addToCartRequestDTO.getProductId()).orElseThrow(() -> new ProductNotFoundExceptions("Product not found"));
-        if (cartRepository.existsCartByProductAndUser(product,user)) {
-            Cart cart = cartRepository.findByUser_IdAndProduct_Id(userId, product.getId());
-            cart.setQuantity(cart.getQuantity() + addToCartRequestDTO.getQuantity());
-            cartRepository.save(cart);
-        } else {
-            Cart newCart = new Cart();
-            newCart.setUser(user);
-            newCart.setProduct(product);
-            newCart.setQuantity(addToCartRequestDTO.getQuantity());
-            cartRepository.save(newCart);
-        }
+    public List<CartResponseDTO> findAllByUser(Long userId) throws UserNotFoundException {
+        User user=userRepository.findById(userId).orElseThrow(()->new UserNotFoundException("user id not found"));
+        List<Cart>list=cartRepository.findAllByUser(user);
+        return list.stream().map((CartResponseDTO::new)).toList();
     }
 
     @Override
-    public void updateProductQuantity( Long userId,CartRequestDTO cartRequestDTO)
-            throws  ProductNotFoundExceptions {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new ProductNotFoundExceptions("User not found"));
-        Cart cartNew=cartRepository.findByProductId(cartRequestDTO.getProductId());
-        if (cartNew==null){
-            throw new ProductNotFoundExceptions("Product not found");
-        }
-        Optional<Product> productOptional = productRepository.findById(cartRequestDTO.getProductId());
-        if (productOptional.isEmpty()) {
-            throw new ProductNotFoundExceptions("Product not found");
-        }
-
-        Cart cart=cartRepository.findByUser_IdAndProduct_Id(user.getId(),productOptional.get().getId());
-        if (cart != null) {
-            if (cartRequestDTO.getQuantity()==0){
-                cartRepository.deleteCartById(cart.getId());
+    public void addToCart(Long userId, AddToCartRequestDTO addToCartRequestDTO) throws UserNotFoundException, QuantityException {
+        User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("User not found"));
+        try {
+            Long productId= Long.valueOf(addToCartRequestDTO.getProductId());
+            Integer quantity= Integer.valueOf(addToCartRequestDTO.getQuantity());
+            Product product = productRepository.findById(productId).orElseThrow(() -> new ProductNotFoundExceptions("Product not found"));
+            if (cartRepository.existsCartByProductAndUser(product,user)) {
+                Cart cart = cartRepository.findByUser_IdAndProduct_Id(userId, product.getId());
+                cart.setQuantity(cart.getQuantity() + quantity);
+                cartRepository.save(cart);
+            } else {
+                Cart newCart = new Cart();
+                newCart.setUser(user);
+                newCart.setProduct(product);
+                newCart.setQuantity(quantity);
+                cartRepository.save(newCart);
             }
-            cart.setQuantity(cartRequestDTO.getQuantity());
-
-            cartRepository.save(cart);
+        }catch (Exception e){
+            throw new QuantityException("vui long nhap so" ,HttpStatus.BAD_REQUEST);
         }
+
+
+    }
+
+    @Transactional
+    @Override
+    public void updateProductQuantity(Long userId, CartRequestDTO cartRequestDTO)
+            throws ProductIDNotFoundException, QuantityException {
+       try {
+           Long productId= Long.valueOf(cartRequestDTO.getProductId());
+           Integer quantity = Integer.valueOf(cartRequestDTO.getQuantity());
+           Cart cart=cartRepository.findByUserIdAndProductId(userId,productId);
+           if (cart == null) {
+               throw new ProductIDNotFoundException("Product not found");
+           } else {
+               if (quantity == 0) {
+                   cartRepository.deleteCartById(cart.getId());
+               } else {
+                   cart.setQuantity(quantity);
+                   cartRepository.save(cart);
+               }
+           }
+       }catch (Exception e) {
+           throw new QuantityException("vui long nhap so error", HttpStatus.BAD_REQUEST);
+       }
+
     }
 
     @Override

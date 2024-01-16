@@ -1,10 +1,11 @@
 package com.ra.controller.admin;
 
-import com.ra.dto.request.ProductRequestDTO;
 import com.ra.dto.request.product.ProductRequestdto;
-import com.ra.dto.respose.ProductResponseDTO;
+import com.ra.dto.respose.product.ProductResponseDto;
+import com.ra.exception.ColorExceptionNotFound;
 import com.ra.exception.ProductExistsException;
-import com.ra.model.Product;
+import com.ra.exception.QuantityException;
+import com.ra.exception.SizeNotFoundException;
 import com.ra.service.product.ProductService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,33 +22,55 @@ public class ProductController {
     private ProductService productService;
     @GetMapping("/product")
     public ResponseEntity<?>findAll(){
-        List<ProductResponseDTO> productResponseDTOList=productService.findAll();
+        List<ProductResponseDto> productResponseDTOList=productService.findAll();
         return new ResponseEntity<>(productResponseDTOList, HttpStatus.OK);
     }
     @PostMapping("/product")
-    public ResponseEntity<?>createProduct(@ModelAttribute @Valid ProductRequestDTO productRequestDTO) throws ProductExistsException {
-            ProductResponseDTO productResponseDTO = productService.createProduct(productRequestDTO);
-            return new ResponseEntity<>(productResponseDTO, HttpStatus.CREATED);
-
+    public ResponseEntity<?>createProductsss(@ModelAttribute @Valid ProductRequestdto productRequestdto) throws ProductExistsException, SizeNotFoundException, ColorExceptionNotFound, QuantityException {
+        ProductResponseDto product=productService.createProductssss(productRequestdto);
+        return new ResponseEntity<>(product,HttpStatus.CREATED);
     }
+//    @PostMapping("/product")
+//    public ResponseEntity<?>createProduct(@ModelAttribute @Valid ProductRequestDTO productRequestDTO) throws ProductExistsException {
+//            ProductResponseDTO productResponseDTO = productService.createProduct(productRequestDTO);
+//            return new ResponseEntity<>(productResponseDTO, HttpStatus.CREATED);
+//    }
+
+
     @GetMapping("/product/{productId}")
-    public ResponseEntity<?>findProductById(@PathVariable Long productId){
-           ProductResponseDTO productResponseDTO=productService.findById(productId);
-           return new ResponseEntity<>(productResponseDTO,HttpStatus.OK);
+    public ResponseEntity<?>findProductById(@PathVariable String productId){
+        try {
+            Long id= Long.valueOf(productId);
+            ProductResponseDto productResponseDto=productService.findById(id);
+            return new ResponseEntity<>(productResponseDto,HttpStatus.OK);
+        }catch (Exception e) {
+            return new ResponseEntity<>("Application context error", HttpStatus.BAD_REQUEST);
+        }
     }
     @PutMapping("/product/{productId}")
     public ResponseEntity<?> updateProduct(
-            @ModelAttribute @Valid ProductRequestDTO productRequestDTO,
-            @PathVariable Long productId) {
-            ProductResponseDTO productResponseDTO = productService.updateProduct(productRequestDTO,productId);
+            @ModelAttribute @Valid ProductRequestdto productRequestdto,
+            @PathVariable String productId) throws SizeNotFoundException, ColorExceptionNotFound {
+        try {
+            Long id= Long.valueOf(productId);
+            ProductResponseDto productResponseDTO = productService.updateProduct(productRequestdto,id);
             return new ResponseEntity<>(productResponseDTO, HttpStatus.OK);
+        }catch (Exception e) {
+            return new ResponseEntity<>("Application context error", HttpStatus.BAD_REQUEST);
+        } catch (QuantityException e) {
+            throw new RuntimeException(e);
+        }
     }
 
-    @PostMapping("/product/add")
-    public ResponseEntity<?>createProductsss(@ModelAttribute @Valid ProductRequestdto productRequestdto) throws ProductExistsException {
-           Product product=productService.createProductssss(productRequestdto);
-           return new ResponseEntity<>(product,HttpStatus.CREATED);
 
-
+    @PatchMapping("product/{productId}")
+    public ResponseEntity<?>changeStatus(@PathVariable String productId){
+        try {
+            Long id= Long.valueOf(productId);
+            productService.changeStatus(id);
+            return new ResponseEntity<>("đổi trang thái " + id + "thành công",HttpStatus.OK);
+        }catch (Exception e) {
+            return new ResponseEntity<>("Application context error", HttpStatus.BAD_REQUEST);
+        }
     }
 }

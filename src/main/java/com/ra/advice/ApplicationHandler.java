@@ -81,6 +81,16 @@ public class ApplicationHandler {
     public ResponseEntity<String> ProductExistsException(ProductExistsException ex) {
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
     }
+    @ExceptionHandler(ProductIDNotFoundException.class)
+    public ResponseEntity<String> ProductIDNotFoundException(ProductIDNotFoundException ex) {
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
+    }
+    @ExceptionHandler(QuantityException.class)
+    public ResponseEntity<String> QuantityException(QuantityException ex) {
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+
+
 
 
 

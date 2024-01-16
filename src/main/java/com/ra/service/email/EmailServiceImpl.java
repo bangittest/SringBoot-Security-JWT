@@ -3,19 +3,22 @@ package com.ra.service.email;
 import com.ra.dto.respose.orders.OrderResponseDTO;
 import com.ra.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
 @Service
 public class EmailServiceImpl implements EmailService{
+    @Value("${email}")
+    private String emailPort;
     @Autowired
     private JavaMailSender javaMailSender;
     @Override
     public String sendEmail() {
         try {
             SimpleMailMessage simpleMailMessage=new SimpleMailMessage();
-            simpleMailMessage.setFrom("banghanam01@gmail.com");
+            simpleMailMessage.setFrom(emailPort);
             simpleMailMessage.setTo("tinhtt336@gmail.com");
             simpleMailMessage.setText("chi tinh");
             simpleMailMessage.setSubject("bang ");
@@ -31,7 +34,7 @@ public class EmailServiceImpl implements EmailService{
     public void sendEmailPass(User user, String token) {
         try {
             SimpleMailMessage simpleMailMessage = new SimpleMailMessage();
-            simpleMailMessage.setFrom("banghanam01@gmail.com");
+            simpleMailMessage.setFrom(emailPort);
             simpleMailMessage.setTo(user.getEmail());
             simpleMailMessage.setSubject("Password Reset");
             simpleMailMessage.setText(user.getResetTokenExpiry() + " Kính gửi " + user.getFullName() + ",\n\n"
@@ -49,7 +52,7 @@ public class EmailServiceImpl implements EmailService{
     public void senEmailOrder(OrderResponseDTO orderResponseDTO) {
         try {
         SimpleMailMessage simpleMailMessage = new SimpleMailMessage();
-        simpleMailMessage.setFrom("banghanam01@gmail.com");
+        simpleMailMessage.setFrom(emailPort);
         simpleMailMessage.setTo(orderResponseDTO.getEmail());
         simpleMailMessage.setSubject(orderResponseDTO.getUserName());
         simpleMailMessage.setText(orderResponseDTO.getOrderDate() + " Kính gửi " + orderResponseDTO.getFullName() + ",\n\n"
@@ -59,6 +62,5 @@ public class EmailServiceImpl implements EmailService{
     } catch (Exception e) {
         e.printStackTrace();
     }
-
 }
 }

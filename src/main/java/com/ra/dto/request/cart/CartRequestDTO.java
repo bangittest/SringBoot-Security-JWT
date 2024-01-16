@@ -1,20 +1,16 @@
 package com.ra.dto.request.cart;
 
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import jakarta.validation.constraints.NotEmpty;
+import lombok.*;
 
 @AllArgsConstructor
 @NoArgsConstructor
-@Data
+@Getter
+@Setter
 @Builder
 public class CartRequestDTO {
-    @NotNull(message = "product Id không được bỏ trống")
-    private Long productId;
-
-    @NotNull(message = "quantity không được bỏ trống")
-    private int quantity;
+    @NotEmpty(message = "id product khong dc bo trong")
+    private String productId;
+    @NotEmpty(message = "quantity product khong dc bo trong")
+    private String quantity;
 }

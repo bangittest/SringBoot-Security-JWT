@@ -48,7 +48,11 @@ public class SizeServiceImpl implements SizeService{
     }
 
     @Override
-    public Size findByName(String name) {
-        return sizeRepository.findSizeByName(name);
+    public Size findByName(String name) throws SizeNotFoundException {
+        Size size = sizeRepository.findSizeByName(name);
+        if (size == null) {
+            throw new SizeNotFoundException("Size not found for name: " + name);
+        }
+        return size;
     }
 }

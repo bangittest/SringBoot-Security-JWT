@@ -6,6 +6,7 @@ import com.ra.model.Size;
 import com.ra.service.size.SizeService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,11 +28,24 @@ public class SizeController {
         return ResponseEntity.ok(size1);
     }
     @GetMapping("/size/{id}")
-    public ResponseEntity<?>findById(@PathVariable Long id) throws SizeNotFoundException {
-        return ResponseEntity.ok(sizeService.findById(id));
+    public ResponseEntity<?>findById(@PathVariable String id) throws SizeNotFoundException {
+
+        try {
+            Long sizeId= Long.valueOf(id);
+            return ResponseEntity.ok(sizeService.findById(sizeId));
+        }
+        catch (Exception e) {
+            return new ResponseEntity<>("Application context error", HttpStatus.BAD_REQUEST);
+        }
     }
     @PutMapping("/size/{id}")
-    public ResponseEntity<?>updateSize(@PathVariable Long id,@RequestBody @Valid SizeRequestDTO sizeRequestDTO) throws SizeNotFoundException {
-        return ResponseEntity.ok(sizeService.updateSize(id,sizeRequestDTO));
+    public ResponseEntity<?>updateSize(@PathVariable String id,@RequestBody @Valid SizeRequestDTO sizeRequestDTO) throws SizeNotFoundException {
+        try {
+            Long sizeId= Long.valueOf(id);
+            return ResponseEntity.ok(sizeService.updateSize(sizeId,sizeRequestDTO));
+        }
+        catch (Exception e) {
+            return new ResponseEntity<>("Application context error", HttpStatus.BAD_REQUEST);
+        }
     }
 }

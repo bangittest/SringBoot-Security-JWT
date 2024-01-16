@@ -30,24 +30,37 @@ public class UserController {
 
     @PatchMapping("users/{userId}/role/{roleId}")
     public ResponseEntity<?> updateUserRole(
-            @PathVariable Long userId,
-            @PathVariable Long roleId) throws UserNotFoundException, RoleNotFoundExceptions {
-            userService.updateUserRole(userId, roleId);
+            @PathVariable String userId,
+            @PathVariable String roleId) throws UserNotFoundException, RoleNotFoundExceptions {
+        try {
+            Long idUser= Long.valueOf(userId);
+            Long idRole= Long.valueOf(roleId);
+            userService.updateUserRole(idUser, idRole);
             return ResponseEntity.ok("Role updated successfully");
+        } catch (Exception e) {
+            return new ResponseEntity<>("Internal Server Error", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @DeleteMapping("users/{userId}/role/{roleId}")
     public ResponseEntity<?> deleteUserRole(
-            @PathVariable Long userId,
-            @PathVariable Long roleId) throws UserNotFoundException, RoleNotFoundExceptions {
-            userService.removeUserRoles(userId, roleId);
+            @PathVariable String userId,
+            @PathVariable String roleId) throws UserNotFoundException, RoleNotFoundExceptions {
+        try {
+            Long idUser= Long.valueOf(userId);
+            Long idRole= Long.valueOf(roleId);
+            userService.removeUserRoles(idUser, idRole);
             return ResponseEntity.ok("Role deleted successfully");
+        } catch (Exception e) {
+            return new ResponseEntity<>("Internal Server Error", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @GetMapping("users/{userId}")
-    public ResponseEntity<?> getUserById(@PathVariable Long userId) throws UserNotFoundException {
+    public ResponseEntity<?> getUserById(@PathVariable String userId) throws UserNotFoundException {
         try {
-            User user = userService.findById(userId);
+            Long id= Long.valueOf(userId);
+            User user = userService.findById(id);
             return ResponseEntity.ok(user);
         } catch (Exception e) {
             return new ResponseEntity<>("Internal Server Error", HttpStatus.INTERNAL_SERVER_ERROR);
@@ -55,9 +68,10 @@ public class UserController {
     }
 
     @PatchMapping("users/{userId}")
-    public ResponseEntity<?> lockUser(@PathVariable Long userId) throws UserNotFoundException {
+    public ResponseEntity<?> lockUser(@PathVariable String userId) throws UserNotFoundException {
         try {
-            userService.lockUser(userId);
+            Long id= Long.valueOf(userId);
+            userService.lockUser(id);
             return ResponseEntity.ok("User locked successfully");
         } catch (Exception e) {
             return new ResponseEntity<>("Internal Server Error", HttpStatus.INTERNAL_SERVER_ERROR);

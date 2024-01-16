@@ -1,11 +1,16 @@
 package com.ra.service.order;
 
 import com.ra.dto.respose.orders.OrderResponseDTO;
+import com.ra.exception.CategoryNotFoundException;
 import com.ra.exception.OrderNotFoundException;
 import com.ra.exception.UserNotFoundException;
+import com.ra.model.Category;
 import com.ra.model.Orders;
+import com.ra.model.Product;
 import com.ra.model.User;
+import com.ra.repository.CategoryRepository;
 import com.ra.repository.OrderRepository;
+import com.ra.service.category.CategoryService;
 import com.ra.service.user.UserService;
 import jakarta.transaction.Transactional;
 import org.hibernate.query.Order;
@@ -14,6 +19,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
@@ -81,5 +87,26 @@ public class OrderServiceImpl implements OrderService{
     public Orders findById(Long orderId) throws OrderNotFoundException {
         Orders orders=orderRepository.findById(orderId).orElseThrow(()-> new OrderNotFoundException("order not found with ID: " + orderId));
         return orders;
+    }
+
+    @Override
+    public BigDecimal getTotal() {
+        return orderRepository.getTotal();
+    }
+
+    @Override
+    public BigDecimal getTotalSalesByMonth(int month) {
+        return orderRepository.getTotalSalesByMonth(month);
+    }
+
+    @Override
+    public BigDecimal getTotalByCategoryId(Category category) {
+
+        return orderRepository.getTotalByCategory(category);
+    }
+
+    @Override
+    public BigDecimal getTotalByProduct(Product product) {
+        return orderRepository.getTotalByProduct(product);
     }
 }

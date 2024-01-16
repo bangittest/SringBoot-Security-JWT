@@ -11,6 +11,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
 import java.util.Set;
 
 @AllArgsConstructor
@@ -25,9 +26,10 @@ public class ProductRequestdto {
     @NotNull(message = "Tiền sản phẩm không được bỏ trống")
     @Positive(message = "Tiền sản phẩm phải lớn hơn 0")
     private Float unitPrice;
-//    private MultipartFile image;
-    @NotNull(message = "Danh mục không được bỏ trống")
-    private Long categoryId;
-    private Set<String>colors;
+    private MultipartFile image;
+    @NotEmpty(message = "Danh mục không được bỏ trống")
+    private String categoryId;
+    private Boolean status=true;
+    private Set<String> colors;
     private Set<String>sizes;
 }

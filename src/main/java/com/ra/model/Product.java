@@ -22,6 +22,8 @@ public class Product {
     private String description;
     private Float unitPrice;
     private String image;
+    @Column(columnDefinition = "boolean default true")
+    private Boolean status=true;
     @ManyToOne
     @JoinColumn(name = "category_id" ,referencedColumnName = "id")
     private Category category;

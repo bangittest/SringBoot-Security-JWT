@@ -23,7 +23,7 @@ public class ForgotPasswordController {
     private UserRepository userRepository;
     @Autowired
     private PasswordEncoder passwordEncoder;
-    @GetMapping("forgot-password")
+    @GetMapping("/forgot-password")
     public ResponseEntity<?>forgot(@RequestParam(name = "email" )String email){
         User user=userService.findByEmail(email);
         if (user==null){

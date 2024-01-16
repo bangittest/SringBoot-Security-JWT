@@ -1,6 +1,9 @@
 package com.ra.controller;
 
-import com.ra.dto.respose.product.ProductDTO;
+import com.ra.dto.respose.home.ProductResponseDTO;
+import com.ra.dto.respose.home.ProductResponseDesDTO;
+import com.ra.dto.respose.product.ProductResponseDto;
+import com.ra.exception.CategoryNotFoundException;
 import com.ra.service.product.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -31,17 +34,35 @@ public class HomeController {
         }else {
             pageable=PageRequest.of(noPage,limit, Sort.by(sort).ascending());
         }
-        Page<ProductDTO>productDTOS=productService.findAllProduct(pageable,keywords);
+        Page<ProductResponseDTO>productDTOS=productService.findAllProduct(pageable,keywords);
         return new ResponseEntity<>(productDTOS, HttpStatus.OK);
     }
     @GetMapping("/product/category/{categoryId}")
-    public ResponseEntity<?>findProductCategory(@PathVariable Long categoryId){
-        List<ProductDTO>productDTOS=productService.findAllCategoryId(categoryId);
-        return new ResponseEntity<>(productDTOS,HttpStatus.OK);
+    public ResponseEntity<?>findProductCategory(@PathVariable String categoryId) {
+       try{
+           Long cateId= Long.valueOf(categoryId);
+           List<ProductResponseDTO>productDTOS=productService.findAllCategoryId(cateId);
+           return new ResponseEntity<>(productDTOS,HttpStatus.OK);
+       }catch (CategoryNotFoundException e){
+           return new ResponseEntity<>("not found id " + categoryId, HttpStatus.NOT_FOUND);
+       }
+       catch (Exception e) {
+           return new ResponseEntity<>("vui long nhap so error", HttpStatus.BAD_REQUEST);
+       }
     }
     @GetMapping("/product/new-products")
     public ResponseEntity<?>findProduct5(){
-        List<ProductDTO>productDTOS=productService.findTop5Products();
+        List<ProductResponseDTO>productDTOS=productService.findTop5Products();
         return new ResponseEntity<>(productDTOS,HttpStatus.OK);
+    }
+    @GetMapping("/product/{productId}")
+    public ResponseEntity<?>findProductDescriptionId(@PathVariable String productId){
+        try{
+            Long proId= Long.valueOf(productId);
+            ProductResponseDesDTO productResponseDesDTO=productService.findProductResponseID(proId);
+            return new ResponseEntity<>(productResponseDesDTO,HttpStatus.OK);
+        }catch (Exception e) {
+            return new ResponseEntity<>("vui long nhap so error", HttpStatus.BAD_REQUEST);
+        }
     }
 }

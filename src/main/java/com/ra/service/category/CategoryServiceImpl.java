@@ -67,4 +67,9 @@ public class CategoryServiceImpl implements CategoryService{
             throw new CategoryNotFoundException("Category not found");
         }
     }
+
+    @Override
+    public long countCategoriesByStatusTrue() {
+        return categoryRepository.countCategoriesByStatusTrue();
+    }
 }
