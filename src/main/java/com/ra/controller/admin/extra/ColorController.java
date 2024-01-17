@@ -33,8 +33,8 @@ public class ColorController {
           Long colorId= Long.valueOf(id);
           Color color=colorService.findById(colorId);
           return ResponseEntity.ok(color);
-      }catch (Exception e) {
-          return new ResponseEntity<>("Application context error", HttpStatus.BAD_REQUEST);
+      }catch (NumberFormatException e) {
+          return new ResponseEntity<>("Please enter a valid number", HttpStatus.BAD_REQUEST);
       }
     }
     @PutMapping("/color/{id}")
@@ -43,8 +43,8 @@ public class ColorController {
           Long colorId= Long.valueOf(id);
           Color color1=colorService.updateColor(colorId,colorRequestDTO);
           return ResponseEntity.ok(color1);
-      }catch (Exception e) {
-          return new ResponseEntity<>("Application context error", HttpStatus.BAD_REQUEST);
+      }catch (NumberFormatException e) {
+          return new ResponseEntity<>("Please enter a valid number", HttpStatus.BAD_REQUEST);
       }
     }
 

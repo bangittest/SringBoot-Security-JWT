@@ -35,7 +35,7 @@ public class DashBoardController {
     @GetMapping("dash-board/total")
     public ResponseEntity<?> getTotal() {
         BigDecimal total=orderService.getTotal();
-        return new ResponseEntity<>("total = " + total,HttpStatus.OK);
+        return new ResponseEntity<>("tổng doanh thu = " + total,HttpStatus.OK);
     }
     @GetMapping("dash-board/sales")
     public ResponseEntity<?> getTotalSalesByMonth(@RequestParam String month) {
@@ -49,8 +49,8 @@ public class DashBoardController {
                return new ResponseEntity<>("total sale thang " + month + " = 0" ,HttpStatus.OK);
            }
            return new ResponseEntity<>("total sale thang " + month + "=" + totalSales,HttpStatus.OK);
-       }catch (Exception e) {
-           return new ResponseEntity<>("Application context error", HttpStatus.BAD_REQUEST);
+       }catch (NumberFormatException e) {
+           return new ResponseEntity<>("Please enter a valid number", HttpStatus.BAD_REQUEST);
        }
     }
     @GetMapping("dash-board/categoryID")
@@ -63,8 +63,8 @@ public class DashBoardController {
             BigDecimal totalCategory = orderService.getTotalByCategoryId(category);
 
             return new ResponseEntity<>("Total revenue for category " + category.getCategoryName() + " is " + totalCategory, HttpStatus.OK);
-        }catch (Exception e) {
-            return new ResponseEntity<>("Application context error", HttpStatus.BAD_REQUEST);
+        }catch (NumberFormatException e) {
+            return new ResponseEntity<>("Please enter a valid number", HttpStatus.BAD_REQUEST);
         }
     }
 
@@ -79,8 +79,8 @@ public class DashBoardController {
            BigDecimal totalProduct = orderService.getTotalByProduct(product);
 
            return new ResponseEntity<>("Total revenue for category " + product.getProductName() + " is " + totalProduct, HttpStatus.OK);
-       }catch (Exception e) {
-           return new ResponseEntity<>("Application context error", HttpStatus.BAD_REQUEST);
+       }catch (NumberFormatException e) {
+           return new ResponseEntity<>("Please enter a valid number", HttpStatus.BAD_REQUEST);
        }
     }
     @GetMapping("dash-board/category")

@@ -21,4 +21,11 @@ public class Cart {
     @JoinColumn(name = "user_id",referencedColumnName = "id")
     private User user;
     private Integer quantity;
+    @ManyToOne
+    @JoinColumn(name = "color_id",referencedColumnName = "id")
+    private Color color;
+    @ManyToOne
+    @JoinColumn(name = "size_id",referencedColumnName = "id")
+    private Size size;
+
 }

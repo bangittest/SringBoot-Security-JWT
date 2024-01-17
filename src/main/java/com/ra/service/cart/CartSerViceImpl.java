@@ -6,7 +6,9 @@ import com.ra.dto.respose.cart.CartResponseDTO;
 import com.ra.exception.*;
 import com.ra.model.*;
 import com.ra.repository.*;
+import com.ra.service.color.ColorService;
 import com.ra.service.product.ProductService;
+import com.ra.service.size.SizeService;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -14,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class CartSerViceImpl implements CartService{
@@ -30,6 +33,14 @@ public class CartSerViceImpl implements CartService{
     OrderRepository orderRepository;
     @Autowired
     OrderDetailRepository orderDetailRepository;
+    @Autowired
+    private SizeService sizeService;
+    @Autowired
+    private SizeRepository sizeRepository;
+    @Autowired
+    private ColorRepository colorRepository;
+    @Autowired
+    private ColorService colorService;
 
     @Override
     public List<CartResponseDTO> findAllByUser(Long userId) throws UserNotFoundException {
@@ -38,53 +49,86 @@ public class CartSerViceImpl implements CartService{
         return list.stream().map((CartResponseDTO::new)).toList();
     }
 
-    @Override
-    public void addToCart(Long userId, AddToCartRequestDTO addToCartRequestDTO) throws UserNotFoundException, QuantityException {
-        User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("User not found"));
-        try {
-            Long productId= Long.valueOf(addToCartRequestDTO.getProductId());
-            Integer quantity= Integer.valueOf(addToCartRequestDTO.getQuantity());
-            Product product = productRepository.findById(productId).orElseThrow(() -> new ProductNotFoundExceptions("Product not found"));
-            if (cartRepository.existsCartByProductAndUser(product,user)) {
-                Cart cart = cartRepository.findByUser_IdAndProduct_Id(userId, product.getId());
-                cart.setQuantity(cart.getQuantity() + quantity);
-                cartRepository.save(cart);
-            } else {
-                Cart newCart = new Cart();
-                newCart.setUser(user);
-                newCart.setProduct(product);
-                newCart.setQuantity(quantity);
-                cartRepository.save(newCart);
-            }
-        }catch (Exception e){
-            throw new QuantityException("vui long nhap so" ,HttpStatus.BAD_REQUEST);
+@Override
+public void addToCart(Long userId, AddToCartRequestDTO addToCartRequestDTO) throws UserNotFoundException, QuantityException {
+    User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("User not found"));
+    try {
+        Long productId = Long.valueOf(addToCartRequestDTO.getProductId());
+        Integer quantity = Integer.valueOf(addToCartRequestDTO.getQuantity());
+
+        Product product = productRepository.findById(productId).orElseThrow(() -> new ProductNotFoundExceptions("Product not found"));
+
+        Size size = sizeService.findByName(addToCartRequestDTO.getSize());
+        if (size == null || !product.getSizes().contains(size)) {
+            throw new SizeNotFoundException("Size not found");
         }
 
+        Color color = colorService.findByColorName(addToCartRequestDTO.getColor());
+        if (color == null || !product.getColors().contains(color)) {
+            throw new ColorExceptionNotFound("Color not found");
+        }
 
+        Cart cart = cartRepository.findCartByProductAndUserAndColorAndSize(product, user,color,size);
+
+        if (cart != null && cart.getProduct().equals(product) && cart.getColor().equals(color) && cart.getSize().equals(size)) {
+            cart.setQuantity(cart.getQuantity() + quantity);
+            cartRepository.save(cart);
+        } else {
+            Cart newCart = new Cart();
+            newCart.setUser(user);
+            newCart.setProduct(product);
+            newCart.setQuantity(quantity);
+            newCart.setColor(color);
+            newCart.setSize(size);
+            cartRepository.save(newCart);
+        }
+    } catch (NumberFormatException e) {
+        throw new QuantityException("Please enter a valid number", HttpStatus.BAD_REQUEST);
+    } catch (SizeNotFoundException | ColorExceptionNotFound | IllegalArgumentException e) {
+        throw new RuntimeException(e);
     }
+}
 
-    @Transactional
     @Override
-    public void updateProductQuantity(Long userId, CartRequestDTO cartRequestDTO)
-            throws ProductIDNotFoundException, QuantityException {
-       try {
-           Long productId= Long.valueOf(cartRequestDTO.getProductId());
-           Integer quantity = Integer.valueOf(cartRequestDTO.getQuantity());
-           Cart cart=cartRepository.findByUserIdAndProductId(userId,productId);
-           if (cart == null) {
-               throw new ProductIDNotFoundException("Product not found");
-           } else {
-               if (quantity == 0) {
-                   cartRepository.deleteCartById(cart.getId());
-               } else {
-                   cart.setQuantity(quantity);
-                   cartRepository.save(cart);
-               }
-           }
-       }catch (Exception e) {
-           throw new QuantityException("vui long nhap so error", HttpStatus.BAD_REQUEST);
-       }
+    public void updateProductQuantity(Long userId, CartRequestDTO cartRequestDTO) throws UserNotFoundException, QuantityException  {
+        User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("User not found"));
+        try {
+        Long productId = Long.valueOf(cartRequestDTO.getProductId());
+        Integer quantity = Integer.valueOf(cartRequestDTO.getQuantity());
 
+        Product product = productRepository.findById(productId).orElseThrow(() -> new ProductNotFoundExceptions("Product not found"));
+
+        Size size = sizeService.findByName(cartRequestDTO.getSize());
+        if (size == null || !product.getSizes().contains(size)) {
+            throw new SizeNotFoundException("Size not found");
+        }
+
+        Color color = colorService.findByColorName(cartRequestDTO.getColor());
+        if (color == null || !product.getColors().contains(color)) {
+            throw new ColorExceptionNotFound("Color not found");
+        }
+
+        Cart cart = cartRepository.findCartByProductAndUserAndColorAndSize(product, user,color,size);
+
+        if (cart != null && cart.getProduct().equals(product) && cart.getColor().equals(color) && cart.getSize().equals(size)) {
+            if (quantity==0){
+                cartRepository.deleteCartById(cart.getId());
+            }else {
+                cart.setQuantity(cart.getQuantity() + quantity);
+                cartRepository.save(cart);
+            }
+//            cart.setSize(size);
+//            cart.setColor(color);
+//            cart.setQuantity(cart.getQuantity() + quantity);
+//            cartRepository.save(cart);
+        }else {
+            throw new IllegalArgumentException("Cannot update cart. Cart entry not found.");
+        }
+    } catch (NumberFormatException e) {
+        throw new QuantityException("Please enter a valid number", HttpStatus.BAD_REQUEST);
+    } catch (SizeNotFoundException | ColorExceptionNotFound | IllegalArgumentException e) {
+        throw new RuntimeException(e);
+    }
     }
 
     @Override
@@ -129,6 +173,8 @@ public class CartSerViceImpl implements CartService{
             orderDetail.setProduct(cartItem.getProduct());
             orderDetail.setQuantity(Long.valueOf(cartItem.getQuantity()));
             orderDetail.setPrice(cartItem.getProduct().getUnitPrice());
+            orderDetail.setColorName(cartItem.getColor().getName());
+            orderDetail.setSizeName(cartItem.getSize().getName());
             orderDetail.setOrders(orders);
 
             orderDetailRepository.save(orderDetail);

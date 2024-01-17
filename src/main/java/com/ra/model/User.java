@@ -1,5 +1,6 @@
 package com.ra.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.ra.model.Role;
 import jakarta.persistence.*;
 import lombok.*;
@@ -37,10 +38,13 @@ public class User {
             inverseJoinColumns = @JoinColumn(name = "role_id"))
 
     private Set<Role>roles;
+    @JsonIgnore
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Cart> carts = new ArrayList<>();
+    @JsonIgnore
     @OneToMany(mappedBy = "user")
     private Set<Orders>orders;
+    @JsonIgnore
     @OneToMany(mappedBy = "user")
     private Set<WishList>wishLists;
 }

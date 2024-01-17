@@ -62,7 +62,7 @@ public class CartController {
     }
     @PutMapping("/cart-update")
     public ResponseEntity<?>updateCart(@Valid @RequestBody CartRequestDTO cartRequestDTO,
-                                       Authentication authentication) throws QuantityException {
+                                       Authentication authentication) throws UserNotFoundException, ProductNotFoundExceptions, QuantityException{
            try {
                if (authentication != null && authentication.isAuthenticated()) {
                    Long userId = userDetailsService.getUserIdFromAuthentication(authentication);
@@ -75,10 +75,8 @@ public class CartController {
                } else {
                    return ResponseEntity.status(401).body("User not authenticated");
                }
-           }catch (Exception e) {
-               return new ResponseEntity<>("Application context error", HttpStatus.BAD_REQUEST);
-           } catch (ProductIDNotFoundException e) {
-               throw new RuntimeException(e);
+           }catch (NumberFormatException e) {
+               return new ResponseEntity<>("Please enter a valid number", HttpStatus.BAD_REQUEST);
            }
     }
     @DeleteMapping("/cart/{id}")
@@ -96,8 +94,8 @@ public class CartController {
                 } else {
                     return ResponseEntity.status(401).body("User not authenticated");
                 }
-            }catch (Exception e) {
-                return new ResponseEntity<>("Application context error", HttpStatus.BAD_REQUEST);
+            }catch (NumberFormatException e) {
+                return new ResponseEntity<>("Please enter a valid number", HttpStatus.BAD_REQUEST);
             }
     }
     @PostMapping("/cart/checkout")
@@ -154,8 +152,8 @@ public class CartController {
            Long idOrder=Long.parseLong(orderId);
 
            return new ResponseEntity<>(orderService.updateStatus(idOrder,2),HttpStatus.OK);
-       }catch (Exception e) {
-           return new ResponseEntity<>("error", HttpStatus.BAD_REQUEST);
+       }catch (NumberFormatException e) {
+           return new ResponseEntity<>("Please enter a valid number", HttpStatus.BAD_REQUEST);
        }
     }
 }

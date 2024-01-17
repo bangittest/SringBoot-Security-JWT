@@ -1,9 +1,11 @@
 package com.ra.controller;
 
+import com.ra.dto.respose.category.CategoryResponseDto;
 import com.ra.dto.respose.home.ProductResponseDTO;
 import com.ra.dto.respose.home.ProductResponseDesDTO;
 import com.ra.dto.respose.product.ProductResponseDto;
 import com.ra.exception.CategoryNotFoundException;
+import com.ra.service.category.CategoryService;
 import com.ra.service.product.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -22,20 +24,28 @@ import java.util.List;
 public class HomeController {
     @Autowired
     private ProductService productService;
+    @Autowired
+    private CategoryService categoryService;
     @GetMapping("/product")
-    public ResponseEntity<?>findAll(@RequestParam(defaultValue = "5",name = "limit" ) Integer limit,
-                                    @RequestParam(name = "page",defaultValue = "0") Integer noPage,
+    public ResponseEntity<?>findAll(@RequestParam(defaultValue = "5",name = "limit" ) String limit,
+                                    @RequestParam(name = "page",defaultValue = "0") String noPage,
                                     @RequestParam(name = "keywords" ,defaultValue = "",required = false)String keywords,
                                     @RequestParam(name = "sort" ,defaultValue = "id")String sort,
                                     @RequestParam(name = "order",defaultValue = "ASC")String order){
-        Pageable pageable;
-        if (order.equals("desc")){
-            pageable=PageRequest.of(noPage,limit, Sort.by(sort).descending());
-        }else {
-            pageable=PageRequest.of(noPage,limit, Sort.by(sort).ascending());
-        }
-        Page<ProductResponseDTO>productDTOS=productService.findAllProduct(pageable,keywords);
-        return new ResponseEntity<>(productDTOS, HttpStatus.OK);
+       try {
+           Integer limit1= Integer.valueOf(limit);
+           Integer noPage1= Integer.valueOf(noPage);
+           Pageable pageable;
+           if (order.equalsIgnoreCase("desc")){
+               pageable=PageRequest.of(noPage1,limit1, Sort.by(sort).descending());
+           }else {
+               pageable=PageRequest.of(noPage1,limit1, Sort.by(sort).ascending());
+           }
+           Page<ProductResponseDTO>productDTOS=productService.findAllProduct(pageable,keywords);
+           return new ResponseEntity<>(productDTOS, HttpStatus.OK);
+       }catch (NumberFormatException e) {
+           return new ResponseEntity<>("Please enter a valid number", HttpStatus.BAD_REQUEST);
+       }
     }
     @GetMapping("/product/category/{categoryId}")
     public ResponseEntity<?>findProductCategory(@PathVariable String categoryId) {
@@ -45,9 +55,8 @@ public class HomeController {
            return new ResponseEntity<>(productDTOS,HttpStatus.OK);
        }catch (CategoryNotFoundException e){
            return new ResponseEntity<>("not found id " + categoryId, HttpStatus.NOT_FOUND);
-       }
-       catch (Exception e) {
-           return new ResponseEntity<>("vui long nhap so error", HttpStatus.BAD_REQUEST);
+       }catch (NumberFormatException e) {
+           return new ResponseEntity<>("Please enter a valid number", HttpStatus.BAD_REQUEST);
        }
     }
     @GetMapping("/product/new-products")
@@ -61,8 +70,44 @@ public class HomeController {
             Long proId= Long.valueOf(productId);
             ProductResponseDesDTO productResponseDesDTO=productService.findProductResponseID(proId);
             return new ResponseEntity<>(productResponseDesDTO,HttpStatus.OK);
-        }catch (Exception e) {
-            return new ResponseEntity<>("vui long nhap so error", HttpStatus.BAD_REQUEST);
+        }catch (NumberFormatException e) {
+            return new ResponseEntity<>("Please enter a valid number", HttpStatus.BAD_REQUEST);
         }
     }
+    @GetMapping("/category")
+    public ResponseEntity<?>findCategory(){
+        List<CategoryResponseDto>list=categoryService.findAllHome();
+        return ResponseEntity.ok(list);
+    }
+    @GetMapping("/product-seach")
+    public ResponseEntity<?>finAllHome(@RequestParam(name = "keywords" ,defaultValue = "",required = false)String keywords){
+        try {
+
+            List<ProductResponseDTO>productDTOS=productService.findAllSearchHome(keywords);
+            return new ResponseEntity<>(productDTOS, HttpStatus.OK);
+        }catch (NumberFormatException e) {
+            return new ResponseEntity<>("Please enter a valid number", HttpStatus.BAD_REQUEST);
+        }
+    }
+    @GetMapping("/product/sort-paginate")
+    public ResponseEntity<?>findAllPaginateHome(@RequestParam(defaultValue = "5",name = "limit" ) String limit,
+                                    @RequestParam(name = "page",defaultValue = "0") String noPage,
+                                    @RequestParam(name = "sort" ,defaultValue = "id")String sort,
+                                    @RequestParam(name = "order",defaultValue = "ASC")String order){
+        try {
+            Integer limit1= Integer.valueOf(limit);
+            Integer noPage1= Integer.valueOf(noPage);
+            Pageable pageable;
+            if (order.equalsIgnoreCase("desc")){
+                pageable=PageRequest.of(noPage1,limit1, Sort.by(sort).descending());
+            }else {
+                pageable=PageRequest.of(noPage1,limit1, Sort.by(sort).ascending());
+            }
+            Page<ProductResponseDTO>productDTOS=productService.findAllProductPaginateHome(pageable);
+            return new ResponseEntity<>(productDTOS, HttpStatus.OK);
+        }catch (NumberFormatException e) {
+            return new ResponseEntity<>("Please enter a valid number", HttpStatus.BAD_REQUEST);
+        }
+    }
+
 }

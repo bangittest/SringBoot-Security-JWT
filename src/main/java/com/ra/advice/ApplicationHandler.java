@@ -39,7 +39,7 @@ public class ApplicationHandler {
     }
     @ExceptionHandler(ProductNotFoundException.class)
     public ResponseEntity<String>ProductNotFoundException(ProductNotFoundException c){
-        return new ResponseEntity<>(c.getMessage(),HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(c.getMessage(),HttpStatus.NO_CONTENT);
     }
     @ExceptionHandler(UserNotFoundException.class)
     public ResponseEntity<String>UserNotFoundException(UserNotFoundException c){
@@ -63,7 +63,7 @@ public class ApplicationHandler {
     }
     @ExceptionHandler(OrderNotFoundException.class)
     public ResponseEntity<String> OrderNotFoundException(OrderNotFoundException ex) {
-        return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.NO_CONTENT);
     }
     @ExceptionHandler(WishListException.class)
     public ResponseEntity<String> WishListException(WishListException ex) {
@@ -83,7 +83,7 @@ public class ApplicationHandler {
     }
     @ExceptionHandler(ProductIDNotFoundException.class)
     public ResponseEntity<String> ProductIDNotFoundException(ProductIDNotFoundException ex) {
-        return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.NO_CONTENT);
     }
     @ExceptionHandler(QuantityException.class)
     public ResponseEntity<String> QuantityException(QuantityException ex) {

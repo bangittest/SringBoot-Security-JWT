@@ -16,6 +16,10 @@ import java.util.List;
 
 public interface ProductService {
     List<ProductResponseDto>findAll();
+    List<ProductResponseDto>findAllSearch(String productName);
+    List<ProductResponseDTO>findAllSearchHome(String productName);
+    Page<ProductResponseDTO>findAllProductPaginateHome(Pageable pageable);
+    Page<ProductResponseDto>findAllPaginate(Pageable pageable);
     List<ProductResponseDTO>findAllCategoryId(Long categoryId);
     ProductResponseDTO createProduct(ProductRequestDTO productRequestDTO) throws ProductExistsException;
     ProductResponseDto findById(Long id);

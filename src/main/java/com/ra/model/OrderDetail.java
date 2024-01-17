@@ -23,6 +23,8 @@ public class OrderDetail {
     private Product product;
     private Long quantity;
     private Float price;
+    private String colorName;
+    private String sizeName;
 
     public OrderDetail(OrderDetail orderDetail) {
         this.id = orderDetail.getId();

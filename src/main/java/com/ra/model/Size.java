@@ -1,11 +1,11 @@
 package com.ra.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.*;
+
+import java.util.Set;
 
 @Entity
 @AllArgsConstructor
@@ -19,5 +19,8 @@ public class Size {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
+    @JsonIgnore
+    @OneToMany(mappedBy = "size")
+    private Set<Cart>carts;
 
 }

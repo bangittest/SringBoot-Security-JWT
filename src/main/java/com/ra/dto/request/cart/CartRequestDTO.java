@@ -13,4 +13,8 @@ public class CartRequestDTO {
     private String productId;
     @NotEmpty(message = "quantity product khong dc bo trong")
     private String quantity;
+    @NotEmpty(message = "ten mau khong dc bo trong")
+    private String color;
+    @NotEmpty(message = "so size khong dc bo trong")
+    private String size;
 }

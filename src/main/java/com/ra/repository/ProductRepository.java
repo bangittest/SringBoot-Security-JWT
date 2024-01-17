@@ -17,9 +17,16 @@ import java.util.List;
 public interface ProductRepository extends JpaRepository<Product,Long> {
     Boolean existsByProductName(String productName);
     List<Product>findAllByCategory(Category category);
-    Page<Product>findAllByProductNameContainsIgnoreCase(Pageable pageable,String productName);
-    @Modifying
-    @Transactional
-    @Query("SELECT COUNT(p) FROM Product p where p.status=true")
-    long countProductsByStatusTrue();
+    List<Product>findAllByStatusTrue();
+    Page<Product>findAllByProductNameContainsIgnoreCaseAndStatusTrue(Pageable pageable,String productName);
+    List<Product>findAllByProductNameContainsIgnoreCase(String productName);
+    Page<Product>findAllByStatusTrue(Pageable pageable);
+
+//    List<Product>findAllByProductNameContainsIgnoreCaseAndStatusTrue()
+//    @Modifying
+//    @Transactional
+//    @Query("SELECT COUNT(p) FROM Product p WHERE p.status = true")
+//    int countProductsByStatusTrue();
+    long countProductByStatusTrue();
+
 }

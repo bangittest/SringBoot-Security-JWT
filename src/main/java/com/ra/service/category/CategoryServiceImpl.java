@@ -2,6 +2,7 @@ package com.ra.service.category;
 
 import com.ra.dto.request.CategoryRequestDTO;
 import com.ra.dto.respose.CategoryResponseDTO;
+import com.ra.dto.respose.category.CategoryResponseDto;
 import com.ra.exception.CategoryAlreadyExistsException;
 import com.ra.exception.CategoryNotFoundException;
 import com.ra.exception.YourCustomBadRequestException;
@@ -9,6 +10,8 @@ import com.ra.model.Category;
 import com.ra.repository.CategoryRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 
@@ -19,6 +22,25 @@ import java.util.Optional;
 public class CategoryServiceImpl implements CategoryService{
     @Autowired
     private CategoryRepository categoryRepository;
+
+    @Override
+    public List<CategoryResponseDto> findAllHome() {
+        List<Category>list=categoryRepository.findAllByStatusTrue();
+        return list.stream().map((CategoryResponseDto::new)).toList();
+    }
+
+    @Override
+    public Page<CategoryResponseDTO> findAllPaginateSort(Pageable pageable) {
+        Page<Category>categories=categoryRepository.findAll(pageable);
+        return categories.map((CategoryResponseDTO::new));
+    }
+
+    @Override
+    public List<CategoryResponseDTO> findAllSearch(String name) {
+        List<Category>list=categoryRepository.findAllByCategoryNameContainsIgnoreCase(name);
+        return list.stream().map((CategoryResponseDTO::new)).toList();
+    }
+
     @Override
     public List<CategoryResponseDTO> findAll() {
         List<Category>categoryList=categoryRepository.findAll();

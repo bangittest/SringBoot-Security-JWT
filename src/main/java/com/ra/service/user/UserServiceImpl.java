@@ -113,52 +113,73 @@ public UserResponseDTO login(UserRequestDTO userRequestDTO) throws UserNotFoundE
     }
 
     @Override
-    public void updateUserRole(Long userId, Long roleId) throws UserNotFoundException, RoleNotFoundExceptions {
+    public void updateUserRole(Long userId, Long roleId,Long adminId) throws UserNotFoundException, RoleNotFoundExceptions {
+        User userAdmin=userRepository.findById(adminId)
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("User not found"));
         if (user.getId() == 1) {
-            throw new UserNotFoundException("Ban k co key not found");
+            throw new UserNotFoundException("Role admin not found");
         }
         Role role = roleRepository.findById(roleId)
                 .orElseThrow(() -> new RoleNotFoundExceptions("Role not found"));
-        Set<Role> roles = user.getRoles();
-        if (roles.contains(role)) {
-            throw new RoleNotFoundExceptions("User da co have the specified role ay");
+        if (role.getName().equalsIgnoreCase("ADMIN")){
+            throw new RoleNotFoundExceptions("Role admin not found");
         }
-        roles.add(role);
-        user.setRoles(roles);
-        userRepository.save(user);
+        if (userAdmin.getId()==1){
+            Set<Role> roles = user.getRoles();
+            if (roles.contains(role)) {
+                throw new RoleNotFoundExceptions("User da co have the specified role ay");
+            }
+            roles.add(role);
+            user.setRoles(roles);
+            userRepository.save(user);
+        }else {
+            throw new RoleNotFoundExceptions("Ban khong phai ADMIN k the phan quyen");
+        }
+
     }
 
     @Override
-    public void removeUserRoles(Long userId, Long roleId) throws RoleNotFoundExceptions, UserNotFoundException {
+    public void removeUserRoles(Long userId, Long roleId,Long adminId) throws RoleNotFoundExceptions, UserNotFoundException {
+        User userAdmin=userRepository.findById(adminId).orElseThrow(() -> new UserNotFoundException("User not found"));
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("User not found"));
-
-        if (user.getId() == 1) {
-            throw new UserNotFoundException("User key not found");
-        }
         Role role = roleRepository.findById(roleId)
                 .orElseThrow(() -> new RoleNotFoundExceptions("Role not found"));
+//        if (role.getName().contains("ADMIN")){
+//            throw new RoleNotFoundExceptions("Ban khong phai Admin nen khong co quyen vao chuc nang nay");
+//        }
         if ("USER".equalsIgnoreCase(role.getName())) {
             throw new RoleNotFoundExceptions("USER mac dinh k the xoa");
         }
-        Set<Role> roles = user.getRoles();
-        if (roles != null) {
-            if (!roles.contains(role)) {
-                throw new RoleNotFoundExceptions("User chua co not have the specified role ay");
-            }
-            roles.remove(role);
+        if (user.getId().equals(userAdmin.getId())){
+            throw new UserNotFoundException("Admin đang đăng nhập không thể xóa quyền");
         }
-        userRepository.save(user);
+        if (userAdmin.getId()==1) {
+            Set<Role> roles = user.getRoles();
+            if (roles != null) {
+                if (!roles.contains(role)) {
+                    throw new RoleNotFoundExceptions("User chua co role nay");
+                }
+                roles.remove(role);
+            }
+            userRepository.save(user);
+        }else {
+            throw new RoleNotFoundExceptions("Ban khong phai ADMIN k the phan quyen");
+        }
     }
 
     @Override
-    public void lockUser(Long userId) throws UserNotFoundException {
+    public void lockUser(Long userId,Long adminId) throws UserNotFoundException {
+        User userAdmin=userRepository.findById(adminId).orElseThrow(()->new UserNotFoundException("User not found " + adminId));
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("User not found " +userId));
         if (user.getRoles().stream().anyMatch(role -> role.getName().equals("ADMIN"))) {
             throw new UserNotFoundException("Admin users cannot be locked " +userId);
+        }
+        if (user.getId().equals(userAdmin.getId())){
+            throw new UserNotFoundException("Admin đang đăng nhập không thể khóa");
         }
         user.setStatus(!user.getStatus());
         userRepository.save(user);

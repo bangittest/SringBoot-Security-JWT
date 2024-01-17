@@ -55,8 +55,8 @@ public class WishListController {
             } else {
                 return ResponseEntity.status(401).body("User not authenticated");
             }
-        }catch (Exception e) {
-            return new ResponseEntity<>("vui long nhap so error", HttpStatus.BAD_REQUEST);
+        }catch (NumberFormatException e) {
+            return new ResponseEntity<>("Please enter a valid number", HttpStatus.BAD_REQUEST);
         }
     }
     @GetMapping("/wishlist")

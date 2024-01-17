@@ -33,9 +33,8 @@ public class SizeController {
         try {
             Long sizeId= Long.valueOf(id);
             return ResponseEntity.ok(sizeService.findById(sizeId));
-        }
-        catch (Exception e) {
-            return new ResponseEntity<>("Application context error", HttpStatus.BAD_REQUEST);
+        }catch (NumberFormatException e) {
+            return new ResponseEntity<>("Please enter a valid number", HttpStatus.BAD_REQUEST);
         }
     }
     @PutMapping("/size/{id}")
@@ -43,9 +42,8 @@ public class SizeController {
         try {
             Long sizeId= Long.valueOf(id);
             return ResponseEntity.ok(sizeService.updateSize(sizeId,sizeRequestDTO));
-        }
-        catch (Exception e) {
-            return new ResponseEntity<>("Application context error", HttpStatus.BAD_REQUEST);
+        }catch (NumberFormatException e) {
+            return new ResponseEntity<>("Please enter a valid number", HttpStatus.BAD_REQUEST);
         }
     }
 }

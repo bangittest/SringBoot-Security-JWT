@@ -32,29 +32,24 @@ public class OrderDetailController {
         Page<OrderResponseDTO>list=orderService.findAll(pageable);
         return new ResponseEntity<>(list, HttpStatus.OK);
     }
-    @PatchMapping("/order/{orderId}/status")
-    public ResponseEntity<?>updateStatus(@PathVariable("orderId") String orderId) throws OrderNotFoundException, UserNotFoundException {
+    @PatchMapping("/order/{orderId}/status/{status}")
+    public ResponseEntity<?>updateStatus(@PathVariable("orderId") String orderId ,@PathVariable("status")String status) throws OrderNotFoundException, UserNotFoundException {
         try {
             Long id= Long.valueOf(orderId);
-            OrderResponseDTO orderResponseDTO=orderService.updateStatus(id,1);
-//        OrderResponseDTO orderResponseDTO1=orderService.findByOrderId(orderResponseDTO.getId());
-            emailService.senEmailOrder(orderResponseDTO);
-            return new ResponseEntity<>("đã duyệt đơn hàng thành công " + orderResponseDTO,HttpStatus.OK);
-        }catch (Exception e) {
-            return new ResponseEntity<>("Application context error", HttpStatus.BAD_REQUEST);
+            Long changeStatus= Long.valueOf(status);
+            if (changeStatus < 0 || changeStatus > 2) {
+                return new ResponseEntity<>("Trạng thái chỉ có ( 1 là xác nhận , 2 là hủy )", HttpStatus.BAD_REQUEST);
+            }
+            if (changeStatus==1){
+                OrderResponseDTO orderResponseDTO=orderService.updateStatus(id,1);
+                emailService.senEmailOrder(orderResponseDTO);
+                return new ResponseEntity<>("đã duyệt đơn hàng thành công " + orderResponseDTO,HttpStatus.OK);
+            }else {
+                OrderResponseDTO orderResponseDTO=orderService.updateStatus(id,2);
+            return new ResponseEntity<>("đã hủy đơn hàng thành công ",HttpStatus.OK);
+            }
+        }catch (NumberFormatException e) {
+            return new ResponseEntity<>("Please enter a valid number", HttpStatus.BAD_REQUEST);
         }
     }
-    @PatchMapping("/order/{orderId}/cancel")
-    public ResponseEntity<?>cancel(@PathVariable("orderId") String orderId) throws OrderNotFoundException {
-        try {
-            Long Id= Long.valueOf(orderId);
-            OrderResponseDTO orderResponseDTO=orderService.updateStatus(Id,2);
-            return new ResponseEntity<>("đã hủy đơn hàng thành công " +orderResponseDTO,HttpStatus.OK);
-        }catch (Exception e) {
-            return new ResponseEntity<>("Application context error", HttpStatus.BAD_REQUEST);
-        }
-
-    }
-
-
 }

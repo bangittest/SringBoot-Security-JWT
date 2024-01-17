@@ -10,10 +10,14 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface CategoryRepository extends JpaRepository<Category,Long> {
     Boolean existsByCategoryName(String categoryName);
+    List<Category>findAllByStatusTrue();
     Page<Category>findAllByCategoryNameContainsIgnoreCase(Pageable pageable,String categoryName);
+    List<Category>findAllByCategoryNameContainsIgnoreCase(String categoryName);
     @Transactional
     @Modifying
     @Query("UPDATE Category c SET c.status = CASE WHEN c.status = true THEN false ELSE true END WHERE c.id = :categoryId")

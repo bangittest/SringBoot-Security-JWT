@@ -45,4 +45,5 @@ public class Product {
     @JoinTable(name = "product_size",joinColumns = @JoinColumn(name = "product_id")
             ,inverseJoinColumns =@JoinColumn(name = "size_id") )
     Set<Size>sizes;
+
 }

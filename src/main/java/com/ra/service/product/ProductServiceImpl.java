@@ -25,6 +25,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class ProductServiceImpl implements ProductService{
@@ -42,6 +43,30 @@ public class ProductServiceImpl implements ProductService{
     public List<ProductResponseDto> findAll() {
         List<Product>productList=productRepository.findAll();
         return productList.stream().map(ProductResponseDto::new).toList();
+    }
+
+    @Override
+    public List<ProductResponseDto> findAllSearch(String productName) {
+        List<Product>productList=productRepository.findAllByProductNameContainsIgnoreCase(productName);
+        return productList.stream().map(ProductResponseDto::new).toList();
+    }
+
+    @Override
+    public List<ProductResponseDTO> findAllSearchHome(String productName) {
+        List<Product>productList=productRepository.findAllByProductNameContainsIgnoreCase(productName);
+        return productList.stream().map(ProductResponseDTO::new).toList();
+    }
+
+    @Override
+    public Page<ProductResponseDTO> findAllProductPaginateHome(Pageable pageable) {
+        Page<Product>list=productRepository.findAllByStatusTrue(pageable);
+        return list.map(ProductResponseDTO::new);
+    }
+
+    @Override
+    public Page<ProductResponseDto> findAllPaginate(Pageable pageable) {
+        Page<Product>list=productRepository.findAll(pageable);
+        return list.map(ProductResponseDto::new);
     }
 
     @Override
@@ -115,19 +140,31 @@ public class ProductServiceImpl implements ProductService{
             product.setImage(fileName);
         }
         product.setId(productId);
-        product.setProductName(productRequestdto.getProductName());
+        if (productRequestdto.getProductName()==null){
+            product.setProductName(product.getProductName());
+        }else {
+            product.setProductName(productRequestdto.getProductName());
+        }
+
         product.setSku(UUID.randomUUID().toString());
-        product.setDescription(productRequestdto.getDescription());
-        product.setUnitPrice(productRequestdto.getUnitPrice());
+        if (productRequestdto.getDescription()==null){
+            product.setDescription(product.getDescription());
+        }else {
+            product.setDescription(productRequestdto.getDescription());
+        }
+        if (productRequestdto.getUnitPrice()==null){
+            product.setUnitPrice(product.getUnitPrice());
+        }else {
+            product.setUnitPrice(productRequestdto.getUnitPrice());
+        }
         try {
           Long categoryId = Long.valueOf(productRequestdto.getCategoryId());
           Category category = categoryRepository.findById(categoryId)
                   .orElseThrow(() -> new CategoryNotFoundException("Category not found with ID: " + categoryId));
           product.setCategory(category);
-       }catch (Exception e){
+       }catch (NumberFormatException e){
           throw new QuantityException("vui long nhap so vao danh muc", HttpStatus.BAD_REQUEST);
        }
-
 //        String fileName=uploadService.uploadImage(productRequestDTO.getImage());
 //        product.setImage(fileName);
         product.setColors(colorSet);
@@ -138,7 +175,7 @@ public class ProductServiceImpl implements ProductService{
 
     @Override
     public Page<ProductResponseDTO> findAllProduct(Pageable pageable, String productName) {
-        Page<Product>list=productRepository.findAllByProductNameContainsIgnoreCase(pageable,productName);
+        Page<Product>list=productRepository.findAllByProductNameContainsIgnoreCaseAndStatusTrue(pageable,productName);
         return list.map(ProductResponseDTO::new);
     }
 
@@ -149,10 +186,9 @@ public class ProductServiceImpl implements ProductService{
         return products.stream().map(ProductResponseDTO::new).toList();
     }
 
-    @Transactional
     @Override
     public long countProductsByStatusTrue() {
-        return productRepository.countProductsByStatusTrue();
+        return productRepository.countProductByStatusTrue();
     }
 
     @Override

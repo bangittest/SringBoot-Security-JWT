@@ -16,6 +16,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class OrderDetailResponseDTO {
     private String productName;
+    private String sizeName;
+    private String colorName;
     private String image;
     private Long quantity;
     private Float price;
@@ -23,6 +25,8 @@ public class OrderDetailResponseDTO {
 
     public OrderDetailResponseDTO(OrderDetail orderDetail) {
         this.productName = orderDetail.getProduct().getProductName();
+        this.sizeName=orderDetail.getSizeName();
+        this.colorName=orderDetail.getColorName();
         this.image = orderDetail.getProduct().getImage();
         this.quantity = orderDetail.getQuantity();
         this.price = orderDetail.getPrice();

@@ -19,9 +19,9 @@ public interface UserService {
     UserRegisterResponseDTO register(UserRegisterRequestDTO userRegisterRequestDTO) throws CustomException;
     UserResponseDTO login(UserRequestDTO userRequestDTO) throws UserNotFoundException;
     User findById(Long id) throws UserNotFoundException;
-    void updateUserRole(Long userId, Long roleId) throws  UserNotFoundException, RoleNotFoundExceptions;
-    void removeUserRoles(Long userId,Long roleId) throws RoleNotFoundExceptions,UserNotFoundException;
-    void lockUser(Long id) throws UserNotFoundException ;
+    void updateUserRole(Long userId, Long roleId,Long adminId) throws  UserNotFoundException, RoleNotFoundExceptions;
+    void removeUserRoles(Long userId,Long roleId,Long adminId) throws RoleNotFoundExceptions,UserNotFoundException;
+    void lockUser(Long id,Long adminId) throws UserNotFoundException ;
     UserDTO checkById(Long id) throws UserNotFoundException;
     UserDTO updateProfile(Long userId,UserProfileDTO userProfileDTO)throws UserNotFoundException;
     void updatePassword(Long userId,String password) throws UserNotFoundException;
