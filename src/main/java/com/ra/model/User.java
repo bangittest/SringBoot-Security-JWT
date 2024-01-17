@@ -1,11 +1,9 @@
 package com.ra.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.ra.model.Role;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -24,7 +22,6 @@ public class User {
     private String userName;
     private String password;
     private String token;
-    private LocalDateTime resetTokenExpiry;
     @Column(unique = true)
     private String email;
     private String fullName;

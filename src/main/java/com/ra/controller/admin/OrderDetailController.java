@@ -1,6 +1,7 @@
 package com.ra.controller.admin;
 
 import com.ra.dto.respose.orders.OrderResponseDTO;
+import com.ra.exception.CustomException;
 import com.ra.exception.OrderNotFoundException;
 import com.ra.exception.UserNotFoundException;
 import com.ra.model.Category;
@@ -60,6 +61,8 @@ public class OrderDetailController {
             }
         }catch (NumberFormatException e) {
             return new ResponseEntity<>("Please enter a valid number", HttpStatus.BAD_REQUEST);
+        } catch (CustomException e) {
+            throw new RuntimeException(e);
         }
     }
 }

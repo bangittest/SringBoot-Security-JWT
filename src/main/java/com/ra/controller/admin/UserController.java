@@ -78,8 +78,8 @@ public class UserController {
         try {
             Long adminUserId=userDetailService.getUserIdFromAuthentication(authentication);
             Long id= Long.valueOf(userId);
-            userService.lockUser(id,adminUserId);
-            return ResponseEntity.ok("User locked successfully");
+                userService.lockUser(id,adminUserId);
+                return ResponseEntity.ok("User locked successfully");
         }catch (NumberFormatException e) {
             return new ResponseEntity<>("Please enter a valid number", HttpStatus.BAD_REQUEST);
         }

@@ -150,10 +150,12 @@ public class CartController {
     public ResponseEntity<?>cancel(@PathVariable("orderId") String orderId) throws OrderNotFoundException {
        try {
            Long idOrder=Long.parseLong(orderId);
-
-           return new ResponseEntity<>(orderService.updateStatus(idOrder,2),HttpStatus.OK);
+           OrderResponseDTO orderResponseDTO= orderService.updateStatus(idOrder,2);
+           return new ResponseEntity<>("huy don hang "+ idOrder+" thanh cong "  +orderResponseDTO,HttpStatus.OK);
        }catch (NumberFormatException e) {
            return new ResponseEntity<>("Please enter a valid number", HttpStatus.BAD_REQUEST);
+       } catch (CustomException e) {
+           throw new RuntimeException(e);
        }
     }
 }

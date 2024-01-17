@@ -1,6 +1,7 @@
 package com.ra.service.order;
 
 import com.ra.dto.respose.orders.OrderResponseDTO;
+import com.ra.exception.CustomException;
 import com.ra.exception.OrderNotFoundException;
 import com.ra.exception.UserNotFoundException;
 import com.ra.model.Category;
@@ -18,7 +19,7 @@ public interface OrderService {
     OrderResponseDTO findByOrderId(Long orderId) throws UserNotFoundException;
     OrderResponseDTO findByOrder(Long orderId) throws OrderNotFoundException;
     Page<OrderResponseDTO> findAll(Pageable pageable);
-    OrderResponseDTO updateStatus(Long orderId,Integer status) throws OrderNotFoundException;
+    OrderResponseDTO updateStatus(Long orderId,Integer status) throws OrderNotFoundException, CustomException;
     Orders findById(Long orderId) throws OrderNotFoundException;
     BigDecimal getTotal();
     BigDecimal getTotalSalesByMonth(int month);

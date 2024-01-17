@@ -60,12 +60,12 @@ public void addToCart(Long userId, AddToCartRequestDTO addToCartRequestDTO) thro
 
         Size size = sizeService.findByName(addToCartRequestDTO.getSize());
         if (size == null || !product.getSizes().contains(size)) {
-            throw new SizeNotFoundException("Size not found");
+            throw new SizeNotFoundException("Size không có trong sản phẩm");
         }
 
         Color color = colorService.findByColorName(addToCartRequestDTO.getColor());
         if (color == null || !product.getColors().contains(color)) {
-            throw new ColorExceptionNotFound("Color not found");
+            throw new ColorExceptionNotFound("Color không có trong sản phẩm");
         }
 
         Cart cart = cartRepository.findCartByProductAndUserAndColorAndSize(product, user,color,size);
@@ -100,12 +100,12 @@ public void addToCart(Long userId, AddToCartRequestDTO addToCartRequestDTO) thro
 
         Size size = sizeService.findByName(cartRequestDTO.getSize());
         if (size == null || !product.getSizes().contains(size)) {
-            throw new SizeNotFoundException("Size not found");
+            throw new SizeNotFoundException("Size không có trong sản phẩm");
         }
 
         Color color = colorService.findByColorName(cartRequestDTO.getColor());
         if (color == null || !product.getColors().contains(color)) {
-            throw new ColorExceptionNotFound("Color not found");
+            throw new ColorExceptionNotFound("Color không có trong sản phẩm");
         }
 
         Cart cart = cartRepository.findCartByProductAndUserAndColorAndSize(product, user,color,size);
@@ -114,7 +114,7 @@ public void addToCart(Long userId, AddToCartRequestDTO addToCartRequestDTO) thro
             if (quantity==0){
                 cartRepository.deleteCartById(cart.getId());
             }else {
-                cart.setQuantity(cart.getQuantity() + quantity);
+                cart.setQuantity(quantity);
                 cartRepository.save(cart);
             }
 //            cart.setSize(size);
@@ -128,7 +128,9 @@ public void addToCart(Long userId, AddToCartRequestDTO addToCartRequestDTO) thro
         throw new QuantityException("Please enter a valid number", HttpStatus.BAD_REQUEST);
     } catch (SizeNotFoundException | ColorExceptionNotFound | IllegalArgumentException e) {
         throw new RuntimeException(e);
-    }
+    } catch (Exception e) {
+            throw new QuantityException("Please enter a valid number", HttpStatus.BAD_REQUEST);
+        }
     }
 
     @Override

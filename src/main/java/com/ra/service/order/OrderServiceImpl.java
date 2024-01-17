@@ -2,6 +2,7 @@ package com.ra.service.order;
 
 import com.ra.dto.respose.orders.OrderResponseDTO;
 import com.ra.exception.CategoryNotFoundException;
+import com.ra.exception.CustomException;
 import com.ra.exception.OrderNotFoundException;
 import com.ra.exception.UserNotFoundException;
 import com.ra.model.Category;
@@ -33,7 +34,7 @@ public class OrderServiceImpl implements OrderService{
     @Override
     public List<OrderResponseDTO> findAllById(Long userId) throws UserNotFoundException {
         User user=userService.findById(userId);
-        List<Orders>orders=orderRepository.findAllByUserOrderByOrderDateDesc(user);
+        List<Orders>orders=orderRepository.findAllByUser(user);
         return orders.stream().map((OrderResponseDTO::new)).toList();
     }
 
@@ -70,7 +71,7 @@ public class OrderServiceImpl implements OrderService{
 
 
     @Override
-    public OrderResponseDTO updateStatus(Long orderId, Integer status) throws OrderNotFoundException {
+    public OrderResponseDTO updateStatus(Long orderId, Integer status) throws OrderNotFoundException, CustomException {
         Optional<Orders> optionalOrder = orderRepository.findById(orderId);
         if (optionalOrder.isPresent()) {
             Orders order = optionalOrder.get();
@@ -79,14 +80,14 @@ public class OrderServiceImpl implements OrderService{
                 return new OrderResponseDTO(order);
             }else {
                 if (order.getStatus()==1){
-                    throw new  OrderNotFoundException("đơn hàng đã xác nhận " + orderId);
+                    throw new CustomException("đơn hàng đã xác nhận " + orderId);
                 }else if(order.getStatus()==2){
-                    throw new OrderNotFoundException("đơn hàng đã bị hủy " + orderId);
+                    throw new CustomException("đơn hàng đã bị hủy " + orderId);
                 }
 
             }
         }
-        throw new OrderNotFoundException("Order not found with ID: " + orderId);
+        throw new CustomException("Order not found with ID: " + orderId);
     }
 
     @Override

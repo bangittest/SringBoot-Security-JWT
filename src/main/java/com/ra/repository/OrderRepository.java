@@ -16,7 +16,7 @@ import java.util.List;
 
 @Repository
 public interface OrderRepository extends JpaRepository<Orders,Long> {
-    List<Orders>findAllByUserOrderByOrderDateDesc(User user);
+    List<Orders>findAllByUser(User user);
     @Transactional
     @Modifying
     @Query("SELECT c FROM Orders c WHERE c.user.id = :userId and c.id=:orderId ORDER BY c.orderDate DESC" )

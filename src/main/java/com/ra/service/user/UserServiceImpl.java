@@ -137,7 +137,7 @@ public UserResponseDTO login(UserRequestDTO userRequestDTO) throws UserNotFoundE
         if (userAdmin.getId()==1){
             Set<Role> roles = user.getRoles();
             if (roles.contains(role)) {
-                throw new RoleNotFoundExceptions("User da co have the specified role ay");
+                throw new RoleNotFoundExceptions("User da co co role mac dinh user");
             }
             roles.add(role);
             user.setRoles(roles);
@@ -187,7 +187,7 @@ public UserResponseDTO login(UserRequestDTO userRequestDTO) throws UserNotFoundE
             throw new UserNotFoundException("Admin users cannot be locked " +userId);
         }
         if (user.getId().equals(userAdmin.getId())){
-            throw new UserNotFoundException("Admin đang đăng nhập không thể khóa");
+            throw new UserNotFoundException("Admin đang đăng nhập không thể locked");
         }
         user.setStatus(!user.getStatus());
         userRepository.save(user);
@@ -243,7 +243,6 @@ public UserResponseDTO login(UserRequestDTO userRequestDTO) throws UserNotFoundE
     public String generateResetToken(User user) {
         String resetToken = UUID.randomUUID().toString();
         user.setToken(resetToken);
-        user.setResetTokenExpiry(LocalDateTime.now().plusHours(1));
         userRepository.save(user);
         return resetToken;
     }

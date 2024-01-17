@@ -45,9 +45,9 @@ public class EmailServiceImpl implements EmailService{
             simpleMailMessage.setFrom(emailPort);
             simpleMailMessage.setTo(user.getEmail());
             simpleMailMessage.setSubject("Password Reset");
-            simpleMailMessage.setText(user.getResetTokenExpiry() + " Kính gửi " + user.getFullName() + ",\n\n"
+            simpleMailMessage.setText(" Kính gửi " + user.getFullName() + ",\n\n"
                     + "Bạn đã yêu cầu đặt lại mật khẩu. Vui lòng nhấp vào liên kết bên dưới để đặt lại mật khẩu:\n\n"
-                    + "Liên kết đặt lại: http://localhost:8080/reset-password?token=" + token + "&password=\n\n"
+                    + "Liên kết đặt lại: http://localhost:8080/reset-password?token=" + token + "&password=\n\n" + " .Tồn tại trong 3 phút."
                     + "Nếu bạn không yêu cầu đặt lại mật khẩu, vui lòng bỏ qua email này.\n\n"
                     + "Cảm ơn,\nSHOP BANG");
             javaMailSender.send(simpleMailMessage);

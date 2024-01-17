@@ -35,6 +35,9 @@ public class DashBoardController {
     @GetMapping("dash-board/total")
     public ResponseEntity<?> getTotal() {
         BigDecimal total=orderService.getTotal();
+        if (total==null){
+            return new ResponseEntity<>("tổng doanh thu = " + 0,HttpStatus.OK);
+        }
         return new ResponseEntity<>("tổng doanh thu = " + total,HttpStatus.OK);
     }
     @GetMapping("dash-board/sales")
