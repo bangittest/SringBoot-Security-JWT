@@ -16,6 +16,7 @@ public interface OrderService {
     List<OrderResponseDTO>findAllById(Long userId) throws UserNotFoundException;
     List<OrderResponseDTO>findAllByOrderId(Long userId,Long orderId) throws UserNotFoundException, OrderNotFoundException;
     OrderResponseDTO findByOrderId(Long orderId) throws UserNotFoundException;
+    OrderResponseDTO findByOrder(Long orderId) throws OrderNotFoundException;
     Page<OrderResponseDTO> findAll(Pageable pageable);
     OrderResponseDTO updateStatus(Long orderId,Integer status) throws OrderNotFoundException;
     Orders findById(Long orderId) throws OrderNotFoundException;

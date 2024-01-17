@@ -57,6 +57,12 @@ public class OrderServiceImpl implements OrderService{
     }
 
     @Override
+    public OrderResponseDTO findByOrder(Long orderId) throws OrderNotFoundException {
+        Orders orders=orderRepository.findById(orderId).orElseThrow(()->new OrderNotFoundException("Order not found with id: " + orderId));
+        return new OrderResponseDTO(orders);
+    }
+
+    @Override
     public Page<OrderResponseDTO> findAll(Pageable pageable) {
         Page<Orders>list=orderRepository.findAll(pageable);
         return list.map((OrderResponseDTO::new));

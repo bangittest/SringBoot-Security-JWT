@@ -25,12 +25,22 @@ public class OrderDetailController {
     private OrderService orderService;
     @Autowired
     private EmailService emailService;
-    @GetMapping("/orders")
+    @GetMapping("/order")
     private ResponseEntity<?>finAll(@RequestParam(name = "limit" ,defaultValue = "5")Integer limit
             ,@RequestParam(name = "page" ,defaultValue = "0")Integer noPage){
         Pageable pageable= PageRequest.of(noPage,limit);
         Page<OrderResponseDTO>list=orderService.findAll(pageable);
         return new ResponseEntity<>(list, HttpStatus.OK);
+    }
+    @GetMapping("/order/{orderId}")
+    public ResponseEntity<?>findByOrder(@PathVariable String orderId) throws OrderNotFoundException {
+        try {
+            Long id= Long.valueOf(orderId);
+            OrderResponseDTO orderResponseDTO=orderService.findByOrder(id);
+            return new ResponseEntity<>(orderResponseDTO,HttpStatus.OK);
+        }catch (NumberFormatException e){
+            return new ResponseEntity<>("vui long nhap so",HttpStatus.BAD_REQUEST);
+        }
     }
     @PatchMapping("/order/{orderId}/status/{status}")
     public ResponseEntity<?>updateStatus(@PathVariable("orderId") String orderId ,@PathVariable("status")String status) throws OrderNotFoundException, UserNotFoundException {

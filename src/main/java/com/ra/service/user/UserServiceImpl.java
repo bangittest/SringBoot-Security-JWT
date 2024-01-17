@@ -51,6 +51,8 @@ public class UserServiceImpl implements UserService{
     private AuthenticationProvider authenticationProvider;
     @Autowired
     private JWTProvider jwtProvider;
+    @Autowired
+    private UserDetailService userDetailService;
     @Override
     public UserRegisterResponseDTO register(UserRegisterRequestDTO userRegisterRequestDTO) throws CustomException {
         // check trung
@@ -90,11 +92,17 @@ public UserResponseDTO login(UserRequestDTO userRequestDTO) throws UserNotFoundE
     try {
         authentication = authenticationProvider.authenticate(
                 new UsernamePasswordAuthenticationToken(userRequestDTO.getUserName(), userRequestDTO.getPassword()));
+        Long userId=userDetailService.getUserIdFromAuthentication(authentication);
+        User user=findById(userId);
+        if (user.getStatus().equals(false)){
+         throw new UserNotFoundException("Tài khoản của bạn đã khóa");
+        }
     } catch (AuthenticationException e) {
         throw new UserNotFoundException("Invalid username or password");
     }
 
     UserPrinciple userPrinciple = (UserPrinciple) authentication.getPrincipal();
+
 
     return UserResponseDTO.builder()
             .token(jwtProvider.generateToken(userPrinciple))
