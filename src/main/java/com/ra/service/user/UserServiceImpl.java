@@ -106,9 +106,9 @@ public UserResponseDTO login(UserRequestDTO userRequestDTO) throws UserNotFoundE
 
     return UserResponseDTO.builder()
             .token(jwtProvider.generateToken(userPrinciple))
-//            .userName(userPrinciple.getUsername())
-//            .roles(userPrinciple.getAuthorities()
-//                    .stream().map(GrantedAuthority::getAuthority).collect(Collectors.toSet()))
+            .userName(userPrinciple.getUsername())
+            .roles(userPrinciple.getAuthorities()
+                    .stream().map(GrantedAuthority::getAuthority).collect(Collectors.toSet()))
             .build();
 }
 

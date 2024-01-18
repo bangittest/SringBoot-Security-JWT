@@ -2,6 +2,7 @@ package com.ra.controller.user;
 
 import com.ra.dto.request.cart.AddToCartRequestDTO;
 import com.ra.dto.request.cart.CartRequestDTO;
+import com.ra.dto.request.cart.CheckOutCartRequestDTO;
 import com.ra.dto.respose.cart.CartResponseDTO;
 import com.ra.dto.respose.orders.OrderResponseDTO;
 import com.ra.exception.*;
@@ -17,6 +18,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/users")
@@ -99,11 +101,11 @@ public class CartController {
             }
     }
     @PostMapping("/cart/checkout")
-    public ResponseEntity<?>checkOut(Authentication authentication) throws UserNotFoundException, CartEmptyException {
+    public ResponseEntity<?>checkOut(@RequestBody CheckOutCartRequestDTO checkOutCartRequestDTO, Authentication authentication) throws UserNotFoundException, CartEmptyException {
             if (authentication != null && authentication.isAuthenticated()) {
                 Long userId = userDetailsService.getUserIdFromAuthentication(authentication);
                 if (userId != null) {
-                    cartService.checkout(userId);
+                    cartService.checkout(userId,checkOutCartRequestDTO);
                     return ResponseEntity.ok("Product checkOut to the cart successfully");
                 } else {
                     return ResponseEntity.status(401).body("User ID not found in authentication details");

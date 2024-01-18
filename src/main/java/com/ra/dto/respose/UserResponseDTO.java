@@ -13,7 +13,7 @@ import java.util.Set;
 @Builder
 public class UserResponseDTO {
     private String token;
-//    private String userName;
-//    private Set<String>roles;
+    private String userName;
+    private Set<String>roles;
 
 }

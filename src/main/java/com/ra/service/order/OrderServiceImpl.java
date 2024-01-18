@@ -39,6 +39,12 @@ public class OrderServiceImpl implements OrderService{
     }
 
     @Override
+    public List<OrderResponseDTO> findAllByStatusFalseOrderByOrderDateDesc() {
+        List<Orders>list=orderRepository.findAllByStatusFalseOrderByOrderDateDesc();
+        return list.stream().map((OrderResponseDTO::new)).toList();
+    }
+
+    @Override
     public List<OrderResponseDTO> findAllByOrderId(Long userId, Long orderId) throws UserNotFoundException, OrderNotFoundException {
         User user=userService.findById(userId);
         Orders orders1=findById(orderId);

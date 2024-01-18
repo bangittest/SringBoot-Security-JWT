@@ -2,6 +2,7 @@ package com.ra.service.cart;
 
 import com.ra.dto.request.cart.AddToCartRequestDTO;
 import com.ra.dto.request.cart.CartRequestDTO;
+import com.ra.dto.request.cart.CheckOutCartRequestDTO;
 import com.ra.dto.respose.cart.CartResponseDTO;
 import com.ra.exception.*;
 import com.ra.model.*;
@@ -14,9 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Service
 public class CartSerViceImpl implements CartService{
@@ -151,40 +150,61 @@ public void addToCart(Long userId, AddToCartRequestDTO addToCartRequestDTO) thro
 
     @Transactional
     @Override
-    public void checkout(Long userId) throws UserNotFoundException, CartEmptyException {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException("User not found"));
+    public void checkout(Long userId, CheckOutCartRequestDTO checkOutCartRequestDTO) throws UserNotFoundException, CartEmptyException {
 
-        if (user.getCarts().isEmpty()) {
-            throw new CartEmptyException("Shopping cart is empty");
+           User user = userRepository.findById(userId)
+                   .orElseThrow(() -> new UserNotFoundException("User not found"));
+
+           if (user.getCarts().isEmpty()) {
+               throw new CartEmptyException("Shopping cart is empty");
+           }
+           Set<String> cartIds = checkOutCartRequestDTO.getOrderId();
+
+           List<Cart> carts = new ArrayList<>();
+
+        try {
+            for (String cid : cartIds) {
+                Long cartId = Long.valueOf(cid);
+                Cart cart = cartRepository.findById(cartId).orElseThrow(() -> new UserNotFoundException("cartId not found"));
+                if (cart != null) {
+                    carts.add(cart);
+                } else {
+                    throw new UserNotFoundException("User not found");
+                }
+            }
+        }catch (NumberFormatException e){
+                throw new UserNotFoundException("validation error");
+            }
+        if (carts.isEmpty()){
+            throw new UserNotFoundException("Bạn phải nhập orderId mới cho thanh toán");
         }
+           Orders orders = new Orders();
+           orders.setUser(user);
+           orders.setOrderDate(new Date());
+           orders.setNotes("");
+           orders.setAddress(user.getAddress());
+           orders.setEmail(user.getEmail());
+           orders.setFullName(user.getFullName());
+           orders.setPhone(user.getPhone());
+           orders.setStatus(0);
+           orders = orderRepository.save(orders);
+           float total = 0;
+           for (Cart cartItem : carts) {
+               OrderDetail orderDetail = new OrderDetail();
+               orderDetail.setProduct(cartItem.getProduct());
+               orderDetail.setQuantity(Long.valueOf(cartItem.getQuantity()));
+               orderDetail.setPrice(cartItem.getProduct().getUnitPrice());
+               orderDetail.setColorName(cartItem.getColor().getName());
+               orderDetail.setSizeName(cartItem.getSize().getName());
+               orderDetail.setOrders(orders);
 
-        Orders orders = new Orders();
-        orders.setUser(user);
-        orders.setOrderDate(new Date());
-        orders.setNotes("");
-        orders.setAddress(user.getAddress());
-        orders.setEmail(user.getEmail());
-        orders.setFullName(user.getFullName());
-        orders.setPhone(user.getPhone());
-        orders.setStatus(0);
-        orders = orderRepository.save(orders);
-        float total = 0;
-        for (Cart cartItem : user.getCarts()) {
-            OrderDetail orderDetail = new OrderDetail();
-            orderDetail.setProduct(cartItem.getProduct());
-            orderDetail.setQuantity(Long.valueOf(cartItem.getQuantity()));
-            orderDetail.setPrice(cartItem.getProduct().getUnitPrice());
-            orderDetail.setColorName(cartItem.getColor().getName());
-            orderDetail.setSizeName(cartItem.getSize().getName());
-            orderDetail.setOrders(orders);
+               orderDetailRepository.save(orderDetail);
+               total += cartItem.getProduct().getUnitPrice() * Long.valueOf(cartItem.getQuantity());
+               cartRepository.deleteCartById(cartItem.getId());
+           }
+           orders.setTotal(total);
+           orderRepository.save(orders);
 
-            orderDetailRepository.save(orderDetail);
-            total += cartItem.getProduct().getUnitPrice() * Long.valueOf(cartItem.getQuantity());
-            cartRepository.deleteCartById(cartItem.getId());
-        }
-        orders.setTotal(total);
-        orderRepository.save(orders);
     }
 
 }

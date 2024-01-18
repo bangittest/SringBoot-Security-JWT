@@ -15,6 +15,7 @@ import java.util.List;
 
 public interface OrderService {
     List<OrderResponseDTO>findAllById(Long userId) throws UserNotFoundException;
+    List<OrderResponseDTO>findAllByStatusFalseOrderByOrderDateDesc();
     List<OrderResponseDTO>findAllByOrderId(Long userId,Long orderId) throws UserNotFoundException, OrderNotFoundException;
     OrderResponseDTO findByOrderId(Long orderId) throws UserNotFoundException;
     OrderResponseDTO findByOrder(Long orderId) throws OrderNotFoundException;

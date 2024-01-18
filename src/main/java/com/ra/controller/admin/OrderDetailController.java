@@ -33,6 +33,15 @@ public class OrderDetailController {
         Page<OrderResponseDTO>list=orderService.findAll(pageable);
         return new ResponseEntity<>(list, HttpStatus.OK);
     }
+    @GetMapping("/order-status")
+    public ResponseEntity<?>findAllByStatusFalseOrderByOrderDateDesc(){
+        List<OrderResponseDTO>list=orderService.findAllByStatusFalseOrderByOrderDateDesc();
+        if (list.isEmpty()){
+            return new ResponseEntity<>("Danh sách bị rỗng",HttpStatus.OK);
+        }else {
+            return new ResponseEntity<>(list,HttpStatus.OK);
+        }
+    }
     @GetMapping("/order/{orderId}")
     public ResponseEntity<?>findByOrder(@PathVariable String orderId) throws OrderNotFoundException {
         try {

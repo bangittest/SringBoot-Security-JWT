@@ -31,55 +31,55 @@ public class ApplicationHandler {
     }
     @ExceptionHandler(CartEmptyException.class)
     public ResponseEntity<String>cartEmptyException(CartEmptyException c){
-        return new ResponseEntity<>(c.getMessage(),HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(c.getMessage(),HttpStatus.BAD_REQUEST);
     }
     @ExceptionHandler(CartNotFoundException.class)
     public ResponseEntity<String>CartNotFoundException(CartNotFoundException c){
-        return new ResponseEntity<>(c.getMessage(),HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(c.getMessage(),HttpStatus.BAD_REQUEST);
     }
     @ExceptionHandler(ProductNotFoundException.class)
     public ResponseEntity<String>ProductNotFoundException(ProductNotFoundException c){
-        return new ResponseEntity<>(c.getMessage(),HttpStatus.NO_CONTENT);
+        return new ResponseEntity<>(c.getMessage(),HttpStatus.BAD_REQUEST);
     }
     @ExceptionHandler(UserNotFoundException.class)
     public ResponseEntity<String>UserNotFoundException(UserNotFoundException c){
-        return new ResponseEntity<>(c.getMessage(),HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(c.getMessage(),HttpStatus.BAD_REQUEST);
     }
     @ExceptionHandler(CategoryNotFoundException.class)
     public ResponseEntity<String> handleCategoryNotFoundException(CategoryNotFoundException ex) {
-        return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
     }
     @ExceptionHandler(RoleNotFoundExceptions.class)
     public ResponseEntity<String> RoleNotFoundExceptions(RoleNotFoundExceptions ex) {
-        return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
     }
     @ExceptionHandler(UserRoleNotFoundExceptionss.class)
     public ResponseEntity<String> UserRoleNotFoundExceptionss(UserRoleNotFoundExceptionss ex) {
-        return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
     }
     @ExceptionHandler(ProductNotFoundExceptions.class)
     public ResponseEntity<String> ProductNotFoundExceptions(ProductNotFoundExceptions ex) {
-        return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
     }
     @ExceptionHandler(OrderNotFoundException.class)
     public ResponseEntity<String> OrderNotFoundException(OrderNotFoundException ex) {
-        return new ResponseEntity<>(ex.getMessage(), HttpStatus.NO_CONTENT);
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
     }
     @ExceptionHandler(WishListException.class)
     public ResponseEntity<String> WishListException(WishListException ex) {
-        return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
     }
     @ExceptionHandler(ColorExceptionNotFound.class)
     public ResponseEntity<String> ColorExceptionNotFound(ColorExceptionNotFound ex) {
-        return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
     }
     @ExceptionHandler(SizeNotFoundException.class)
     public ResponseEntity<String> SizeNotFoundException(SizeNotFoundException ex) {
-        return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
     }
     @ExceptionHandler(ProductExistsException.class)
     public ResponseEntity<String> ProductExistsException(ProductExistsException ex) {
-        return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
     }
     @ExceptionHandler(ProductIDNotFoundException.class)
     public ResponseEntity<String> ProductIDNotFoundException(ProductIDNotFoundException ex) {
